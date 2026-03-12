@@ -279,6 +279,10 @@ body {
 .f-label { font-size: 9px; text-transform: uppercase; letter-spacing: 0.07em; margin-top: 3px; }
 
 /* Protection tips grid (2 cols, used under UV Levels) */
+.tips-intro {
+  font-size: 12px; color: var(--muted);
+  line-height: 1.5; margin: 0 0 14px;
+}
 .tips-grid {
   display: grid; grid-template-columns: repeat(2, 1fr);
   gap: 14px; margin-top: 4px;
@@ -290,6 +294,11 @@ body {
   padding: 16px;
   display: flex; gap: 12px; align-items: flex-start;
 }
+.tip-item.highlighted {
+  border-color: rgba(255, 107, 53, 0.5);
+  background: linear-gradient(135deg, rgba(255, 107, 53, 0.12), rgba(255, 107, 53, 0.04));
+}
+.tip-item.highlighted .tip-title { color: var(--orange); }
 .tip-icon {
   font-size: 22px; flex-shrink: 0;
   margin-top: 2px;
