@@ -1,0 +1,291 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>SunSmart — Protect</title>
+<link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;600;700;800&family=DM+Sans:ital,wght@0,300;0,400;0,500;1,400&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+<nav class="topnav">
+  <a href="uv-levels.html" class="logo">☀️ Sun<span class="dot">Smart</span></a>
+  <div class="nav-links">
+    <a href="uv-levels.html" class="nav-link">☀️ UV Levels</a>
+    <a href="awareness.html" class="nav-link">📊 Awareness</a>
+    <a href="protection.html" class="nav-link active">🧴 Protect</a>
+  </div>
+  <div class="nav-user">A</div>
+</nav>
+
+<main class="page-content">
+  <div class="us-tag"><span class="badge" style="background:rgba(61,214,140,.15);border-color:rgba(61,214,140,.3);color:var(--green);">US 3.3</span>
+    <span style="color:var(--green);">MUST HAVE · Epic 3.0 — Prevention</span>
+  </div>
+  <h1 class="page-title">Sun-Smart Clothing Guide</h1>
+  <p class="page-sub">Outfit recommendations based on today's UV Index — stay cool while blocking radiation</p>
+
+  <div class="sub-tabs">
+    <button class="sub-tab">🧴 Sunscreen Dosage</button>
+    <button class="sub-tab active">👕 Clothing Guide</button>
+    <button class="sub-tab">⏰ Reminders</button>
+  </div>
+
+  <div class="annotation green">UV slider is interactive — try different UV levels</div>
+
+  <div class="uv-strip">
+    <div class="uv-strip-icon">☀️</div>
+    <div>
+      <div class="uv-strip-num" id="uvNum">UV 8</div>
+      <div class="uv-strip-sub">Very High · Melbourne, VIC · pulled from UV Levels tab</div>
+    </div>
+    <div class="uv-slider-wrap" style="margin-left:32px;">
+      <div class="uv-slider-label">Try different UV levels</div>
+      <input type="range" class="uv-slider" id="uvSlider" min="1" max="13" value="8">
+    </div>
+    <div class="uv-level-pill">
+      <div class="level-dot" id="levelDot"></div>
+      <div class="level-text" id="levelText">Very High</div>
+    </div>
+  </div>
+
+  <div class="main-layout">
+    <div>
+      <div class="activity-card">
+        <div class="card-title">Your Activity</div>
+        <div class="activity-list">
+          <div class="activity-item selected">
+            <span class="act-icon">🏃</span>
+            <span class="act-name">Outdoor exercise</span>
+            <div class="act-check">✓</div>
+          </div>
+          <div class="activity-item">
+            <span class="act-icon">🏖️</span>
+            <span class="act-name">Beach / Pool</span>
+            <div class="act-check"></div>
+          </div>
+          <div class="activity-item">
+            <span class="act-icon">🚶</span>
+            <span class="act-name">Casual walking</span>
+            <div class="act-check"></div>
+          </div>
+          <div class="activity-item">
+            <span class="act-icon">⛺</span>
+            <span class="act-name">Hiking / Camping</span>
+            <div class="act-check"></div>
+          </div>
+          <div class="activity-item">
+            <span class="act-icon">🌳</span>
+            <span class="act-name">Park / Picnic</span>
+            <div class="act-check"></div>
+          </div>
+          <div class="activity-item">
+            <span class="act-icon">🎓</span>
+            <span class="act-name">Campus / School</span>
+            <div class="act-check"></div>
+          </div>
+        </div>
+      </div>
+      <div class="duration-card">
+        <div class="card-title">Time Outdoors</div>
+        <div class="duration-opts">
+          <button class="dur-btn">&lt; 30 min</button>
+          <button class="dur-btn selected">1–2 hrs</button>
+          <button class="dur-btn">2–4 hrs</button>
+          <button class="dur-btn">4+ hrs</button>
+        </div>
+      </div>
+    </div>
+
+    <div>
+      <div class="rec-grid" id="recGrid">
+        <div class="clothing-card ok">
+          <div class="cc-header">
+            <div class="cc-icon-wrap green">👕</div>
+            <div>
+              <div class="cc-cat">Top</div>
+              <div class="cc-item-name">Long-sleeve shirt</div>
+            </div>
+          </div>
+          <div class="upf-badge">UPF 50+ fabric</div>
+          <p class="cc-desc">Lightweight, loose-weave long sleeve in light colours. Look for polyester-nylon blends rated UPF 50+ — they block 98% of UV while staying breathable.</p>
+          <div class="avoid-row">
+            <div class="avoid-label">Avoid</div>
+            <div class="chip-row">
+              <span class="chip avoid">Wet cotton</span>
+              <span class="chip avoid">Dark colours</span>
+              <span class="chip avoid">Mesh fabric</span>
+            </div>
+          </div>
+        </div>
+        <div class="clothing-card ok">
+          <div class="cc-header">
+            <div class="cc-icon-wrap amber">👖</div>
+            <div>
+              <div class="cc-cat">Bottom</div>
+              <div class="cc-item-name">Long light pants</div>
+            </div>
+          </div>
+          <div class="upf-badge amber">UPF 30–50</div>
+          <p class="cc-desc">Lightweight chinos or activewear pants in neutral tones. Cover your legs when UV is Very High or above — UV 8 significantly accelerates leg skin ageing.</p>
+          <div class="avoid-row">
+            <div class="avoid-label">Avoid</div>
+            <div class="chip-row">
+              <span class="chip avoid">Shorts</span>
+              <span class="chip avoid">Thin linen</span>
+            </div>
+            <div class="avoid-label" style="margin-top:6px;">Recommended</div>
+            <div class="chip-row">
+              <span class="chip rec">Activewear</span>
+              <span class="chip rec">UV-rated fabric</span>
+            </div>
+          </div>
+        </div>
+        <div class="clothing-card ok">
+          <div class="cc-header">
+            <div class="cc-icon-wrap green">🎩</div>
+            <div>
+              <div class="cc-cat">Hat</div>
+              <div class="cc-item-name">Wide-brim hat</div>
+            </div>
+          </div>
+          <div class="upf-badge">Brim ≥ 7.5 cm</div>
+          <p class="cc-desc">A wide-brim hat (≥ 7.5 cm brim) protects face, ears, and neck — areas most often missed by sunscreen. Essential for UV 6 and above.</p>
+          <div class="avoid-row">
+            <div class="avoid-label">Avoid</div>
+            <div class="chip-row">
+              <span class="chip avoid">Cap brims</span>
+              <span class="chip avoid">Straw (open weave)</span>
+            </div>
+          </div>
+        </div>
+        <div class="clothing-card ok">
+          <div class="cc-header">
+            <div class="cc-icon-wrap purple">🕶️</div>
+            <div>
+              <div class="cc-cat">Eye Protection</div>
+              <div class="cc-item-name">Wraparound sunnies</div>
+            </div>
+          </div>
+          <div class="upf-badge" style="background:rgba(155,114,207,.12);border-color:rgba(155,114,207,.25);color:var(--purple);">UV400 rated</div>
+          <p class="cc-desc">UV400 wraparound sunglasses block 100% of UVA and UVB. Wrap-style frames prevent UV from entering from the sides — especially important for sport.</p>
+          <div class="avoid-row">
+            <div class="avoid-label">Avoid</div>
+            <div class="chip-row">
+              <span class="chip avoid">Non-UV rated</span>
+              <span class="chip avoid">Fashion-only lenses</span>
+            </div>
+          </div>
+        </div>
+        <div class="clothing-card ok">
+          <div class="cc-header">
+            <div class="cc-icon-wrap amber">👟</div>
+            <div>
+              <div class="cc-cat">Footwear</div>
+              <div class="cc-item-name">Closed-toe shoes</div>
+            </div>
+          </div>
+          <div class="upf-badge amber">Tops of feet at risk</div>
+          <p class="cc-desc">Tops of feet are a high-exposure, often-forgotten zone. Closed shoes or apply SPF to exposed foot skin. UV damage accumulates significantly here over time.</p>
+          <div class="avoid-row">
+            <div class="avoid-label">Avoid</div>
+            <div class="chip-row">
+              <span class="chip avoid">Thongs / sandals</span>
+              <span class="chip avoid">Barefoot outdoors</span>
+            </div>
+          </div>
+        </div>
+        <div class="clothing-card" style="background:linear-gradient(135deg,rgba(61,214,140,.1),rgba(255,107,53,.06));border-color:rgba(61,214,140,.2);">
+          <div class="card-title" style="margin-bottom:10px;">Overall Protection</div>
+          <div style="font-family:'Syne',sans-serif;font-size:52px;font-weight:800;color:var(--green);line-height:1;">92%</div>
+          <div style="font-size:12px;color:var(--muted);margin-bottom:16px;margin-top:3px;">UV blocked with full outfit selected</div>
+          <div style="height:8px;background:rgba(255,255,255,.07);border-radius:4px;overflow:hidden;margin-bottom:6px;">
+            <div style="width:92%;height:100%;background:linear-gradient(90deg,var(--green),var(--amber));border-radius:4px;"></div>
+          </div>
+          <div style="font-size:11px;color:var(--muted);">5 / 5 categories covered</div>
+          <div style="margin-top:18px;padding:12px;background:var(--surf2);border-radius:var(--r);">
+            <div style="font-size:11px;color:var(--muted);margin-bottom:5px;font-family:'Syne',sans-serif;font-weight:700;text-transform:uppercase;letter-spacing:.08em;">Reminder</div>
+            <div style="font-size:12px;color:var(--text);line-height:1.5;">Combine with 1¾ tsp SPF 50+ sunscreen on exposed skin for maximum protection.</div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="bottom-row">
+    <div class="upf-explainer">
+      <div class="card-title">What is UPF?</div>
+      <p style="font-size:13px;color:var(--muted);line-height:1.6;margin-bottom:14px;">
+        UPF (Ultraviolet Protection Factor) is the clothing equivalent of SPF — it measures how much UV radiation a fabric blocks. Unlike SPF, UPF covers both UVA and UVB.
+      </p>
+      <div class="upf-scale">
+        <div class="upf-block" style="background:rgba(250,204,21,.1);border:1px solid rgba(250,204,21,.2);">
+          <span class="upf-num" style="color:#facc15;">15–24</span>
+          <span class="upf-lbl">Good<br>93% UV blocked</span>
+        </div>
+        <div class="upf-block" style="background:rgba(255,107,53,.1);border:1px solid rgba(255,107,53,.2);">
+          <span class="upf-num" style="color:var(--orange);">25–39</span>
+          <span class="upf-lbl">Very Good<br>96% UV blocked</span>
+        </div>
+        <div class="upf-block" style="background:rgba(61,214,140,.1);border:1px solid rgba(61,214,140,.2);">
+          <span class="upf-num" style="color:var(--green);">40–50+</span>
+          <span class="upf-lbl">Excellent<br>98% UV blocked</span>
+        </div>
+      </div>
+    </div>
+    <div class="weather-card">
+      <div class="card-title" style="color:var(--orange);">Today's Conditions — Melbourne</div>
+      <div class="weather-grid">
+        <div class="weather-item">
+          <span class="w-label">Temperature</span>
+          <span class="w-val">28°C</span>
+          <span class="w-desc">Feels like 31°C</span>
+        </div>
+        <div class="weather-item">
+          <span class="w-label">UV Index</span>
+          <span class="w-val" style="color:var(--orange);">8</span>
+          <span class="w-desc">Very High</span>
+        </div>
+        <div class="weather-item">
+          <span class="w-label">Cloud Cover</span>
+          <span class="w-val">15%</span>
+          <span class="w-desc">Mostly clear — UV unfiltered</span>
+        </div>
+        <div class="weather-item">
+          <span class="w-label">Peak UV Time</span>
+          <span class="w-val">1–3 PM</span>
+          <span class="w-desc">Avoid direct exposure</span>
+        </div>
+      </div>
+    </div>
+  </div>
+</main>
+
+<script>
+var uvLevels = [
+  { max: 2,  label: "Low",       color: "#4ade80" },
+  { max: 5,  label: "Moderate",  color: "#facc15" },
+  { max: 7,  label: "High",      color: "#fb923c" },
+  { max: 10, label: "Very High", color: "#f87171" },
+  { max: 20, label: "Extreme",   color: "#c084fc" }
+];
+function getLevel(uv) {
+  return uvLevels.find(function(l) { return uv <= l.max; }) || uvLevels[uvLevels.length - 1];
+}
+var slider = document.getElementById('uvSlider');
+if (slider) {
+  var uvNum = document.getElementById('uvNum');
+  var lvlDot = document.getElementById('levelDot');
+  var lvlText = document.getElementById('levelText');
+  slider.addEventListener('input', function() {
+    var uv = parseInt(slider.value, 10);
+    var lvl = getLevel(uv);
+    if (uvNum) uvNum.textContent = 'UV ' + uv;
+    if (lvlDot) lvlDot.style.background = lvl.color;
+    if (lvlText) { lvlText.style.color = lvl.color; lvlText.textContent = lvl.label; }
+  });
+}
+</script>
+</body>
+</html>
