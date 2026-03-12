@@ -142,30 +142,31 @@
 
   <div class="card" id="tipsCard" style="display:none;">
     <div class="card-title" id="tipsTitle">Protection Tips for UV —</div>
+    <p class="tips-intro">When the UV index is 3 or higher, protect your skin. UV is strongest between 10am and 4pm. Protection is important all year, including on cloudy and cool days—UV reflects off water, sand, cement, and snow.</p>
     <div class="tips-grid">
       <div class="tip-item">
-        <span class="tip-icon">🧴</span>
-        <div><div class="tip-title">Apply SPF 20 min before going out</div><div class="tip-body">Sunscreen needs time to bind to skin before UV exposure. Use broad-spectrum SPF 30+ (SPF 50+ when UV is high or extreme) and apply a generous amount to all exposed skin.</div></div>
+        <span class="tip-icon">🕶️</span>
+        <div><div class="tip-title">Wear sunglasses</div><div class="tip-body">Sunglasses protect your eyes from UV rays and reduce the risk of cataracts, and protect the skin around your eyes. Choose ones that block both UVA and UVB; wrap-around styles work best by blocking UV from the sides.</div></div>
       </div>
       <div class="tip-item">
-        <span class="tip-icon">🔄</span>
-        <div><div class="tip-title">Reapply every 2 hours</div><div class="tip-body">SPF breaks down with sun exposure, sweat, and water. Set a reminder to reapply so you stay protected all day, especially after swimming or heavy activity.</div></div>
+        <span class="tip-icon">🧴</span>
+        <div><div class="tip-title">Use broad-spectrum sunscreen</div><div class="tip-body">Use SPF 15 or higher that filters both UVA and UVB. Apply a thick layer to all exposed skin before going outside. Reapply after 2 hours and after swimming, sweating, or toweling off. Check the expiration date.</div></div>
       </div>
       <div class="tip-item">
         <span class="tip-icon">🎩</span>
-        <div><div class="tip-title">Cover ears, neck &amp; hands</div><div class="tip-body">Wear a broad-brimmed hat and clothing that covers often-missed areas. Ears, neck, and the backs of hands get strong, repeated UV and are common sites for skin damage.</div></div>
+        <div><div class="tip-title">Wear a broad-brimmed hat</div><div class="tip-body">Choose a hat with a brim all the way around that shades your face, ears, and the back of your neck. Tightly woven fabric (e.g. canvas) works best. Avoid straw hats with holes that let sunlight through. If you wear a baseball cap, also protect your ears and neck with clothing or sunscreen.</div></div>
+      </div>
+      <div class="tip-item">
+        <span class="tip-icon">👕</span>
+        <div><div class="tip-title">Wear protective clothing</div><div class="tip-body">When possible, wear long sleeves and long pants or skirts. Tightly woven fabric offers the best protection. A wet T-shirt gives much less UV protection than a dry one; darker colors may offer more protection than light ones.</div></div>
       </div>
       <div class="tip-item">
         <span class="tip-icon">🌲</span>
-        <div><div class="tip-title">Find shade when UV is high</div><div class="tip-body">Seek shade under trees, umbrellas, or buildings during peak UV hours (usually 10am–3pm). Shade greatly reduces direct exposure and lowers burn risk.</div></div>
+        <div><div class="tip-title">Seek shade</div><div class="tip-body">Stay under an umbrella, tree, or other shelter to reduce sun damage risk. Use sunscreen or protective clothing even when you’re in the shade—your best protection combines shade with other measures.</div></div>
       </div>
       <div class="tip-item">
         <span class="tip-icon">⏰</span>
-        <div><div class="tip-title">Set a reapply reminder</div><div class="tip-body">It’s easy to forget to reapply. Set a phone or watch reminder every 2 hours when you’re outdoors so sunscreen stays effective.</div></div>
-      </div>
-      <div class="tip-item">
-        <span class="tip-icon">🕶️</span>
-        <div><div class="tip-title">Wear sunglasses &amp; protective clothing</div><div class="tip-body">Wrap-around sunglasses with UV protection help prevent eye damage. Long sleeves and collared shirts in light, loose fabrics add a physical barrier without overheating.</div></div>
+        <div><div class="tip-title">Limit exposure during peak UV</div><div class="tip-body">UV rays are strongest from 10am to 4pm (9am to 3pm standard time). Plan outdoor activities for early morning or late afternoon when possible, and take breaks in the shade to reapply sunscreen and rehydrate.</div></div>
       </div>
     </div>
   </div>
@@ -313,6 +314,14 @@
     document.getElementById('tipsTitle').textContent = 'Protection Tips for UV ' + Math.round(uv);
     document.getElementById('tipsCard').style.display = 'block';
     document.getElementById('forecastCard').style.display = 'block';
+
+    var tipItems = document.querySelectorAll('.tips-grid .tip-item');
+    var n = Math.round(uv);
+    var highlightCount = n <= 2 ? 2 : n <= 5 ? 3 : n <= 7 ? 4 : n <= 10 ? 5 : 6;
+    for (var t = 0; t < tipItems.length; t++) {
+      if (t < highlightCount) tipItems[t].classList.add('highlighted');
+      else tipItems[t].classList.remove('highlighted');
+    }
 
     var calcUvInput = document.getElementById('calcUv');
     if (calcUvInput) calcUvInput.value = uv < 1 ? 1 : (Math.round(uv * 10) / 10);
