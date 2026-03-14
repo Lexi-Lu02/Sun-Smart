@@ -5,7 +5,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>SunSmart — UV Levels</title>
 <link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;600;700;800&family=DM+Sans:ital,wght@0,300;0,400;0,500;1,400&display=swap" rel="stylesheet">
-<link rel="stylesheet" href="style.css">
+<link rel="stylesheet" href="css/style.css">
 </head>
 <body>
 
@@ -22,7 +22,11 @@
 <main class="page-content">
   <div class="us-tag"><span class="badge">US 1.1</span> MUST HAVE · Epic 1.0 — Track UV Levels</div>
   <h1 class="page-title">UV Levels</h1>
-  <button type="button" id="useMyLocationBtn" class="annotation">📍 Share my location</button>
+  <div class="postcode-lookup">
+    <label for="postcodeInput" class="sr-only">Australian postcode</label>
+    <input type="text" id="postcodeInput" class="postcode-input" inputmode="numeric" pattern="[0-9]*" maxlength="4" placeholder="Enter postcode (e.g. 2000)">
+    <button type="button" id="lookupPostcodeBtn" class="annotation postcode-btn">📍 Get UV for postcode</button>
+  </div>
   <p id="locationError" style="font-size:11px;color:#f87171;margin-top:6px;margin-bottom:0;display:none;"></p>
 
   <div class="uv-hero">
@@ -490,41 +494,66 @@
       });
   }
 
-  // Use my location: get geolocation and fetch UV for user's position
-  function useMyLocation() {
-    var btn = document.getElementById('useMyLocationBtn');
-    btn.disabled = true;
-    btn.textContent = 'Getting location…';
-    clearError();
+  // Postcode lookup: load Australian postcodes and fetch UV by lat/lng from API
+  var postcodesByCode = {};
 
-    if (!navigator.geolocation) {
-      showError('Geolocation is not supported by your browser.');
-      btn.disabled = false;
-      btn.textContent = '📍 Share my location';
+  function loadPostcodes() {
+    return fetch('data/postcodes.json')
+      .then(function(res) {
+        if (!res.ok) throw new Error('Could not load postcodes.');
+        return res.json();
+      })
+      .then(function(arr) {
+        postcodesByCode = {};
+        for (var i = 0; i < arr.length; i++) {
+          var p = arr[i];
+          if (!postcodesByCode[p.postcode]) postcodesByCode[p.postcode] = p;
+        }
+        return postcodesByCode;
+      });
+  }
+
+  function lookupByPostcode() {
+    var input = document.getElementById('postcodeInput');
+    var btn = document.getElementById('lookupPostcodeBtn');
+    if (!input || !btn) return;
+
+    var raw = (input.value || '').trim().replace(/\s/g, '');
+    if (!raw) {
+      showError('Please enter a postcode.');
       return;
     }
 
-    navigator.geolocation.getCurrentPosition(
-      function(pos) {
-        var lat = pos.coords.latitude;
-        var lng = pos.coords.longitude;
-        fetchUv(lat, lng, 'Your location');
-        btn.textContent = '📍 Share my location';
-        btn.disabled = false;
-      },
-      function(err) {
-        var msg = err.code === 1 ? 'Location permission denied.' : (err.message || 'Could not get location.');
-        showError(msg);
-        btn.textContent = '📍 Share my location';
-        btn.disabled = false;
-      },
-      { enableHighAccuracy: true, timeout: 10000, maximumAge: 0 }
-    );
+    // Australian postcodes: 3 or 4 digits
+    var postcode = raw.length <= 4 ? raw : raw.slice(0, 4);
+    var loc = postcodesByCode[postcode];
+    if (!loc && /^\d+$/.test(postcode)) {
+      // Try without leading zeros (e.g. 0810 -> 810)
+      loc = postcodesByCode[String(parseInt(postcode, 10))];
+    }
+    if (!loc) {
+      showError('Postcode "' + postcode + '" not found. Enter a valid Australian postcode.');
+      return;
+    }
+
+    clearError();
+    btn.disabled = true;
+    btn.textContent = 'Loading…';
+    var label = (loc.suburb || '') + (loc.state ? ', ' + loc.state : '');
+    fetchUv(loc.latitude, loc.longitude, label || ('Postcode ' + postcode));
+    btn.disabled = false;
+    btn.textContent = '📍 Get UV for postcode';
   }
 
   function init() {
-    var useMyLocationBtn = document.getElementById('useMyLocationBtn');
-    if (useMyLocationBtn) useMyLocationBtn.addEventListener('click', useMyLocation);
+    var lookupBtn = document.getElementById('lookupPostcodeBtn');
+    var postcodeInput = document.getElementById('postcodeInput');
+    if (lookupBtn) lookupBtn.addEventListener('click', lookupByPostcode);
+    if (postcodeInput) {
+      postcodeInput.addEventListener('keydown', function(e) {
+        if (e.key === 'Enter') { e.preventDefault(); lookupByPostcode(); }
+      });
+    }
 
     var calcBtn = document.getElementById('calcBtn');
     if (calcBtn) {
@@ -536,6 +565,11 @@
 
     runSunburnCalc();
     fetchUv(DEFAULT_LAT, DEFAULT_LNG, DEFAULT_LABEL);
+
+    // Load Australian postcodes for lookup (from data/reference/australian-postcodes.sql)
+    loadPostcodes().catch(function() {
+      showError('Could not load postcode data. Using default location.');
+    });
   }
 
   if (document.readyState === 'loading') {
