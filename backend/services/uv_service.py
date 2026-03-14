@@ -70,12 +70,12 @@ async def fetch_uv_data(lat: float, lon: float, skin_type: str = "type2"):
             )
             return cached["data"]
 
-    # Cache miss — fetch from Open-Meteo
+    # Cache miss — fetch from Open-Meteo (UV, temperature, cloud cover)
     url = "https://api.open-meteo.com/v1/forecast"
     params = {
         "latitude": lat,
         "longitude": lon,
-        "hourly": "uv_index",
+        "hourly": "uv_index,temperature_2m,apparent_temperature,cloud_cover",
         "timezone": "auto",
         "forecast_days": 1,
     }
@@ -85,13 +85,29 @@ async def fetch_uv_data(lat: float, lon: float, skin_type: str = "type2"):
         response.raise_for_status()
         data = response.json()
 
-    # Extract hourly uv_index list
-    times = data["hourly"]["time"]        # ["2026-03-13T00:00", ...]
-    uv_list = data["hourly"]["uv_index"]  # [0.0, 0.1, 3.2, ...]
+    # Extract hourly lists
+    times = data["hourly"]["time"]
+    uv_list = data["hourly"]["uv_index"]
+    temp_list = data["hourly"].get("temperature_2m", [0] * len(times))
+    feels_list = data["hourly"].get("apparent_temperature", temp_list)
+    cloud_list = data["hourly"].get("cloud_cover", [0] * len(times))
 
-    # Get current hour's UV index
-    current_hour = datetime.now().hour
-    current_uv = uv_list[current_hour]
+    # Get current hour index (use first 24h)
+    now = datetime.now()
+    current_hour = now.hour
+    current_uv = uv_list[current_hour] if current_hour < len(uv_list) else (uv_list[0] if uv_list else 0)
+    current_temp = temp_list[current_hour] if current_hour < len(temp_list) else None
+    current_feels = feels_list[current_hour] if current_hour < len(feels_list) else current_temp
+    current_cloud = cloud_list[current_hour] if current_hour < len(cloud_list) else None
+
+    # Peak UV: hour (0-23) with max UV in daytime 6–20
+    peak_uv_val = 0.0
+    peak_uv_hour = 12
+    for i, (t, uv) in enumerate(zip(times, uv_list)):
+        hour = int(t[11:13]) if len(t) >= 13 else i
+        if 6 <= hour <= 20 and uv > peak_uv_val:
+            peak_uv_val = uv
+            peak_uv_hour = hour
 
     # Build hourly forecast (daytime hours 6am–8pm only)
     hourly_forecast = []
@@ -112,6 +128,13 @@ async def fetch_uv_data(lat: float, lon: float, skin_type: str = "type2"):
     burn_time = calc_burn_time(current_uv, skin_type)
     alert_msg = build_alert_message(current_uv, burn_time)
 
+    # Peak UV time string e.g. "1–3 PM"
+    peak_end = min(peak_uv_hour + 2, 20)
+    h1 = peak_uv_hour % 12 or 12
+    h2 = peak_end % 12 or 12
+    ampm = "PM" if peak_uv_hour >= 12 else "AM"
+    peak_uv_time = f"{h1}–{h2} {ampm}"
+
     result = {
         "uv_index": round(current_uv, 1),
         "level": level,
@@ -120,6 +143,11 @@ async def fetch_uv_data(lat: float, lon: float, skin_type: str = "type2"):
         "alert_message": alert_msg,
         "spf_recommendation": spf,
         "hourly_forecast": hourly_forecast,
+        "current_temp": round(current_temp, 1) if current_temp is not None else None,
+        "feels_like": round(current_feels, 1) if current_feels is not None else None,
+        "cloud_cover": int(round(current_cloud)) if current_cloud is not None else None,
+        "peak_uv_time": peak_uv_time,
+        "peak_uv_hour": peak_uv_hour,
     }
 
     # Save to cache before returning

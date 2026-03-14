@@ -42,6 +42,7 @@
   --radius-sm: 12px;
   --radius-lg: 22px;
   --radius-pill: 999px;
+  --r: 12px; 
 }
 
 html {
@@ -215,6 +216,7 @@ svg {
   color: var(--muted);
   font-size: 15px;
   line-height: 1.6;
+  margin-bottom: 8px;
 }
 
 /* =========================
@@ -1198,6 +1200,7 @@ svg {
   border: 1px solid var(--border);
   border-radius: var(--radius);
   padding: 18px 24px;
+  margin-top: 28px;
   margin-bottom: 24px;
 }
 

@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>SunSmart — Protect</title>
+<title>SunSmart — Protections</title>
 <link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;600;700;800&family=DM+Sans:ital,wght@0,300;0,400;0,500;1,400&display=swap" rel="stylesheet">
 <link rel="stylesheet" href="css/style.css">
 </head>
@@ -14,7 +14,7 @@
   <div class="nav-links">
     <a href="uv-levels.html" class="nav-link">☀️ UV Levels</a>
     <a href="awareness.html" class="nav-link">📊 Awareness</a>
-    <a href="protection.html" class="nav-link active">🧴 Protect</a>
+    <a href="protection.html" class="nav-link active">🧴 Protections</a>
   </div>
   <div class="nav-user">A</div>
 </nav>
@@ -23,22 +23,14 @@
   <div class="us-tag"><span class="badge" style="background:rgba(61,214,140,.15);border-color:rgba(61,214,140,.3);color:var(--green);">US 3.3</span>
     <span style="color:var(--green);">MUST HAVE · Epic 3.0 — Prevention</span>
   </div>
-  <h1 class="page-title">Sun-Smart Clothing Guide</h1>
-  <p class="page-sub">Outfit recommendations based on today's UV Index — stay cool while blocking radiation</p>
-
-  <div class="sub-tabs">
-    <button class="sub-tab">🧴 Sunscreen Dosage</button>
-    <button class="sub-tab active">👕 Clothing Guide</button>
-    <button class="sub-tab">⏰ Reminders</button>
-  </div>
-
-  <div class="annotation green">UV slider is interactive — try different UV levels</div>
+  <h1 class="page-title">Protect Your Skin</h1>
+  <p class="page-sub">When the UV Index is 3 or above, cover up: clothing is your first line of defence — it blocks UV without reapplication. Remember <strong>Slip, Slop, Slap, Seek, Slide</strong> (slip on clothing, slop on sunscreen, slap on a hat, seek shade, slide on sunglasses). Use the slider below for outfit tips by UV level.</p>
 
   <div class="uv-strip">
     <div class="uv-strip-icon">☀️</div>
     <div>
       <div class="uv-strip-num" id="uvNum">UV 8</div>
-      <div class="uv-strip-sub">Very High · Melbourne, VIC · pulled from UV Levels tab</div>
+      <div class="uv-strip-sub" id="uvStripSub">Adjust slider for your conditions</div>
     </div>
     <div class="uv-slider-wrap" style="margin-left:32px;">
       <div class="uv-slider-label">Try different UV levels</div>
@@ -50,56 +42,50 @@
     </div>
   </div>
 
-  <div class="main-layout">
-    <div>
-      <div class="activity-card">
-        <div class="card-title">Your Activity</div>
-        <div class="activity-list">
-          <div class="activity-item selected">
-            <span class="act-icon">🏃</span>
-            <span class="act-name">Outdoor exercise</span>
-            <div class="act-check">✓</div>
-          </div>
-          <div class="activity-item">
-            <span class="act-icon">🏖️</span>
-            <span class="act-name">Beach / Pool</span>
-            <div class="act-check"></div>
-          </div>
-          <div class="activity-item">
-            <span class="act-icon">🚶</span>
-            <span class="act-name">Casual walking</span>
-            <div class="act-check"></div>
-          </div>
-          <div class="activity-item">
-            <span class="act-icon">⛺</span>
-            <span class="act-name">Hiking / Camping</span>
-            <div class="act-check"></div>
-          </div>
-          <div class="activity-item">
-            <span class="act-icon">🌳</span>
-            <span class="act-name">Park / Picnic</span>
-            <div class="act-check"></div>
-          </div>
-          <div class="activity-item">
-            <span class="act-icon">🎓</span>
-            <span class="act-name">Campus / School</span>
-            <div class="act-check"></div>
-          </div>
-        </div>
+  <div class="card calc-card" id="calcCard">
+    <div class="card-title">Sunburn timer calculator</div>
+    <p class="calc-desc">Estimate how long you can stay in the sun before burning. UV index is synced with the slider above.</p>
+    <div class="calc-form">
+      <div class="calc-field">
+        <label for="calcUv">UV index</label>
+        <input type="number" id="calcUv" min="0" max="15" step="0.1" value="8" placeholder="e.g. 8">
       </div>
-      <div class="duration-card">
-        <div class="card-title">Time Outdoors</div>
-        <div class="duration-opts">
-          <button class="dur-btn">&lt; 30 min</button>
-          <button class="dur-btn selected">1–2 hrs</button>
-          <button class="dur-btn">2–4 hrs</button>
-          <button class="dur-btn">4+ hrs</button>
-        </div>
+      <div class="calc-field">
+        <label for="calcSkin">Skin type (Fitzpatrick)</label>
+        <select id="calcSkin">
+          <option value="1">Type I — Very fair, always burns</option>
+          <option value="2" selected>Type II — Fair, burns easily</option>
+          <option value="3">Type III — Medium, sometimes burns</option>
+          <option value="4">Type IV — Olive, rarely burns</option>
+          <option value="5">Type V — Brown, very rarely burns</option>
+          <option value="6">Type VI — Dark, never burns</option>
+        </select>
       </div>
+      <div class="calc-field">
+        <label for="calcSpf">Sunscreen SPF (cap 50)</label>
+        <input type="number" id="calcSpf" min="1" max="50" value="30" placeholder="30">
+      </div>
+      <div class="calc-field">
+        <label for="calcCloud">Cloud cover</label>
+        <select id="calcCloud">
+          <option value="1">Clear sky (100% UV)</option>
+          <option value="0.9">Light clouds (90% UV)</option>
+          <option value="0.8">Moderate clouds (80% UV)</option>
+          <option value="0.7">Heavy clouds (70% UV)</option>
+        </select>
+      </div>
+      <button type="button" id="calcBtn" class="calc-btn">Calculate</button>
     </div>
+    <div class="calc-result" id="calcResult" aria-live="polite">
+      <span class="calc-result-label">Time before burning (approx.):</span>
+      <span class="calc-result-value" id="calcResultValue" aria-live="polite">—</span>
+    </div>
+    <p class="calc-method">How we calculate: MED by skin type (I=200, II=250, III=300, IV=450, V=600, VI=1000 J/m²). UV irradiance = UVI × 0.025 W/m² × cloud. Time to MED (min) = MED ÷ (irradiance × 60). SPF multiplier = 1 + 0.8×(SPF−1), cap 50.</p>
+  </div>
 
-    <div>
-      <div class="rec-grid" id="recGrid">
+  <p class="page-sub" style="margin-top:0;margin-bottom:20px;">When the UV index is 3 or higher, protect your skin. UV is strongest between 10am and 4pm. Combine clothing, sunscreen, hat, sunglasses and shade for full protection.</p>
+
+  <div class="rec-grid rec-grid-full" id="recGrid">
         <div class="clothing-card ok">
           <div class="cc-header">
             <div class="cc-icon-wrap green">👕</div>
@@ -109,13 +95,18 @@
             </div>
           </div>
           <div class="upf-badge">UPF 50+ fabric</div>
-          <p class="cc-desc">Lightweight, loose-weave long sleeve in light colours. Look for polyester-nylon blends rated UPF 50+ — they block 98% of UV while staying breathable.</p>
+          <p class="cc-desc">Long sleeves with a close weave block more UV. Dark or bright colours absorb more UV than white or pastels; synthetic and tightly woven fabrics (e.g. polyester, denim) offer better protection. Loose fit helps — tight clothes can stretch and let more UV through.</p>
           <div class="avoid-row">
             <div class="avoid-label">Avoid</div>
             <div class="chip-row">
               <span class="chip avoid">Wet cotton</span>
-              <span class="chip avoid">Dark colours</span>
-              <span class="chip avoid">Mesh fabric</span>
+              <span class="chip avoid">Thin / loose weave</span>
+              <span class="chip avoid">Mesh or sheer</span>
+            </div>
+            <div class="avoid-label" style="margin-top:6px;">Better</div>
+            <div class="chip-row">
+              <span class="chip rec">Close weave</span>
+              <span class="chip rec">Dark or bright colours</span>
             </div>
           </div>
         </div>
@@ -128,17 +119,17 @@
             </div>
           </div>
           <div class="upf-badge amber">UPF 30–50</div>
-          <p class="cc-desc">Lightweight chinos or activewear pants in neutral tones. Cover your legs when UV is Very High or above — UV 8 significantly accelerates leg skin ageing.</p>
+          <p class="cc-desc">Long pants or skirts in close-weave fabric protect legs when UV is High or above. Loose fit keeps protection — tight fabric stretches and lets more UV through. Activewear or UPF-rated options are ideal for long exposure.</p>
           <div class="avoid-row">
             <div class="avoid-label">Avoid</div>
             <div class="chip-row">
-              <span class="chip avoid">Shorts</span>
-              <span class="chip avoid">Thin linen</span>
+              <span class="chip avoid">Shorts (high UV)</span>
+              <span class="chip avoid">Thin / loose weave</span>
             </div>
             <div class="avoid-label" style="margin-top:6px;">Recommended</div>
             <div class="chip-row">
-              <span class="chip rec">Activewear</span>
-              <span class="chip rec">UV-rated fabric</span>
+              <span class="chip rec">Loose fit</span>
+              <span class="chip rec">UPF-rated fabric</span>
             </div>
           </div>
         </div>
@@ -150,13 +141,18 @@
               <div class="cc-item-name">Wide-brim hat</div>
             </div>
           </div>
-          <div class="upf-badge">Brim ≥ 7.5 cm</div>
-          <p class="cc-desc">A wide-brim hat (≥ 7.5 cm brim) protects face, ears, and neck — areas most often missed by sunscreen. Essential for UV 6 and above.</p>
+          <div class="upf-badge">Brim ≥ 7.5 cm (adults)</div>
+          <p class="cc-desc">A wide-brim, bucket or legionnaire hat shades face, scalp, ears and neck. Choose densely woven fabric — loosely woven straw lets UV through. Caps and visors leave ears and neck exposed.</p>
           <div class="avoid-row">
             <div class="avoid-label">Avoid</div>
             <div class="chip-row">
-              <span class="chip avoid">Cap brims</span>
+              <span class="chip avoid">Caps / visors</span>
               <span class="chip avoid">Straw (open weave)</span>
+            </div>
+            <div class="avoid-label" style="margin-top:6px;">Better</div>
+            <div class="chip-row">
+              <span class="chip rec">Densely woven</span>
+              <span class="chip rec">Wide brim, bucket, legionnaire</span>
             </div>
           </div>
         </div>
@@ -168,8 +164,8 @@
               <div class="cc-item-name">Wraparound sunnies</div>
             </div>
           </div>
-          <div class="upf-badge" style="background:rgba(155,114,207,.12);border-color:rgba(155,114,207,.25);color:var(--purple);">UV400 rated</div>
-          <p class="cc-desc">UV400 wraparound sunglasses block 100% of UVA and UVB. Wrap-style frames prevent UV from entering from the sides — especially important for sport.</p>
+          <div class="upf-badge" style="background:rgba(155,114,207,.12);border-color:rgba(155,114,207,.25);color:var(--purple);">UV400 / EPF 9–10</div>
+          <p class="cc-desc">Choose wrap-around sunglasses labelled for UV protection (UV400 or EPF 9–10). Category 2 or higher lenses absorb more than 95% of UV. In Australia, look for AS1067 on the tag.</p>
           <div class="avoid-row">
             <div class="avoid-label">Avoid</div>
             <div class="chip-row">
@@ -196,29 +192,84 @@
             </div>
           </div>
         </div>
-        <div class="clothing-card" style="background:linear-gradient(135deg,rgba(61,214,140,.1),rgba(255,107,53,.06));border-color:rgba(61,214,140,.2);">
-          <div class="card-title" style="margin-bottom:10px;">Overall Protection</div>
-          <div style="font-family:'Syne',sans-serif;font-size:52px;font-weight:800;color:var(--green);line-height:1;">92%</div>
-          <div style="font-size:12px;color:var(--muted);margin-bottom:16px;margin-top:3px;">UV blocked with full outfit selected</div>
-          <div style="height:8px;background:rgba(255,255,255,.07);border-radius:4px;overflow:hidden;margin-bottom:6px;">
-            <div style="width:92%;height:100%;background:linear-gradient(90deg,var(--green),var(--amber));border-radius:4px;"></div>
+        <div class="clothing-card ok">
+          <div class="cc-header">
+            <div class="cc-icon-wrap green">🧴</div>
+            <div>
+              <div class="cc-cat">Sunscreen</div>
+              <div class="cc-item-name">Broad-spectrum SPF 50+</div>
+            </div>
           </div>
-          <div style="font-size:11px;color:var(--muted);">5 / 5 categories covered</div>
-          <div style="margin-top:18px;padding:12px;background:var(--surf2);border-radius:var(--r);">
-            <div style="font-size:11px;color:var(--muted);margin-bottom:5px;font-family:'Syne',sans-serif;font-weight:700;text-transform:uppercase;letter-spacing:.08em;">Reminder</div>
-            <div style="font-size:12px;color:var(--text);line-height:1.5;">Combine with 1¾ tsp SPF 50+ sunscreen on exposed skin for maximum protection.</div>
+          <div class="upf-badge">Reapply every 2 hours</div>
+          <p class="cc-desc">Use SPF 50+ that filters both UVA and UVB on any skin you can’t cover. Apply a thick layer (about 7 teaspoons for full body) 20 minutes before going out. Reapply after 2 hours and after swimming, sweating, or toweling off. Check the expiry date.</p>
+          <div class="avoid-row">
+            <div class="avoid-label">Avoid</div>
+            <div class="chip-row">
+              <span class="chip avoid">Expired sunscreen</span>
+              <span class="chip avoid">Make-up SPF only</span>
+            </div>
+            <div class="avoid-label" style="margin-top:6px;">Recommended</div>
+            <div class="chip-row">
+              <span class="chip rec">AUST L / AS/NZS label</span>
+              <span class="chip rec">20 min before sun</span>
+            </div>
           </div>
         </div>
-      </div>
-    </div>
+        <div class="clothing-card ok">
+          <div class="cc-header">
+            <div class="cc-icon-wrap green">🌲</div>
+            <div>
+              <div class="cc-cat">Shade</div>
+              <div class="cc-item-name">Seek shade</div>
+            </div>
+          </div>
+          <div class="upf-badge">Extra barrier from UV</div>
+          <p class="cc-desc">Stay under an umbrella, tree, or shelter to reduce sun damage risk. UV can reflect off water, sand, cement and snow — use sunscreen and clothing even in the shade. Dense foliage gives the best natural shade.</p>
+          <div class="avoid-row">
+            <div class="avoid-label">Avoid</div>
+            <div class="chip-row">
+              <span class="chip avoid">Reflective surfaces alone</span>
+              <span class="chip avoid">Skipping shade at midday</span>
+            </div>
+            <div class="avoid-label" style="margin-top:6px;">Recommended</div>
+            <div class="chip-row">
+              <span class="chip rec">Portable umbrella</span>
+              <span class="chip rec">Dense tree cover</span>
+            </div>
+          </div>
+        </div>
+        <div class="clothing-card ok">
+          <div class="cc-header">
+            <div class="cc-icon-wrap amber">⏰</div>
+            <div>
+              <div class="cc-cat">Timing</div>
+              <div class="cc-item-name">Limit peak UV exposure</div>
+            </div>
+          </div>
+          <div class="upf-badge amber">Peak 10am–4pm</div>
+          <p class="cc-desc">UV is strongest from 10am to 4pm (9am–3pm standard time). Plan outdoor activities for early morning or late afternoon when possible. Take breaks in the shade to reapply sunscreen and rehydrate.</p>
+          <div class="avoid-row">
+            <div class="avoid-label">Avoid</div>
+            <div class="chip-row">
+              <span class="chip avoid">Long exposure at midday</span>
+              <span class="chip avoid">No breaks in shade</span>
+            </div>
+            <div class="avoid-label" style="margin-top:6px;">Recommended</div>
+            <div class="chip-row">
+              <span class="chip rec">Early morning</span>
+              <span class="chip rec">Late afternoon</span>
+            </div>
+          </div>
+        </div>
   </div>
 
   <div class="bottom-row">
     <div class="upf-explainer">
       <div class="card-title">What is UPF?</div>
-      <p style="font-size:13px;color:var(--muted);line-height:1.6;margin-bottom:14px;">
-        UPF (Ultraviolet Protection Factor) is the clothing equivalent of SPF — it measures how much UV radiation a fabric blocks. Unlike SPF, UPF covers both UVA and UVB.
+      <p style="font-size:13px;color:var(--muted);line-height:1.6;margin-bottom:10px;">
+        UPF (Ultraviolet Protection Factor) measures how much UV a fabric blocks — like SPF for clothing. UPF covers both UVA and UVB. A white cotton T-shirt has a UPF of only about 5–7; when wet it can drop to around 3. Dense weave, dark or bright colours, and UPF-rated fabric give much better protection.
       </p>
+      <p style="font-size:12px;color:var(--muted);line-height:1.5;margin-bottom:14px;">Wet or stretched clothing loses protection — use sunscreen on exposed skin and reapply after swimming or sweating.</p>
       <div class="upf-scale">
         <div class="upf-block" style="background:rgba(250,204,21,.1);border:1px solid rgba(250,204,21,.2);">
           <span class="upf-num" style="color:#facc15;">15–24</span>
@@ -233,59 +284,102 @@
           <span class="upf-lbl">Excellent<br>98% UV blocked</span>
         </div>
       </div>
-    </div>
-    <div class="weather-card">
-      <div class="card-title" style="color:var(--orange);">Today's Conditions — Melbourne</div>
-      <div class="weather-grid">
-        <div class="weather-item">
-          <span class="w-label">Temperature</span>
-          <span class="w-val">28°C</span>
-          <span class="w-desc">Feels like 31°C</span>
-        </div>
-        <div class="weather-item">
-          <span class="w-label">UV Index</span>
-          <span class="w-val" style="color:var(--orange);">8</span>
-          <span class="w-desc">Very High</span>
-        </div>
-        <div class="weather-item">
-          <span class="w-label">Cloud Cover</span>
-          <span class="w-val">15%</span>
-          <span class="w-desc">Mostly clear — UV unfiltered</span>
-        </div>
-        <div class="weather-item">
-          <span class="w-label">Peak UV Time</span>
-          <span class="w-val">1–3 PM</span>
-          <span class="w-desc">Avoid direct exposure</span>
-        </div>
+      <div style="margin-top:16px;padding:12px;background:var(--surf2);border-radius:var(--r);border-left:3px solid var(--green);">
+        <div style="font-size:11px;color:var(--muted);margin-bottom:4px;font-family:'Syne',sans-serif;font-weight:700;text-transform:uppercase;letter-spacing:.06em;">5 things that affect protection</div>
+        <p style="font-size:12px;color:var(--text);line-height:1.55;margin:0;"><strong>Colour</strong> — dark or bright absorbs more UV than white/pastels. <strong>Construction</strong> — tight weave, synthetics or denim beat thin, loose weave. <strong>UPF</strong> — labelled UPF 50+ blocks 98%. <strong>Coverage</strong> — more skin covered, more protected. <strong>Fit</strong> — looser is better; tight fabric stretches and lets more UV through.</p>
+      </div>
+      <div style="margin-top:14px;font-size:11px;color:var(--muted);">
+        <span style="font-family:'Syne',sans-serif;font-weight:700;">Learn more:</span>
+        <a href="https://www.sunsmart.com.au/protect-your-skin" target="_blank" rel="noopener noreferrer" style="color:var(--orange);margin-left:6px;">SunSmart Australia</a>,
+        <a href="https://www.skincancer.org/skin-cancer-prevention/sun-protection/sun-protective-clothing/" target="_blank" rel="noopener noreferrer" style="color:var(--orange);margin-left:4px;">Skin Cancer Foundation</a>,
+        <a href="https://www.skincancer.org/blog/dress-to-protect-5-things-that-affect-how-well-your-clothes-block-uv-rays/" target="_blank" rel="noopener noreferrer" style="color:var(--orange);margin-left:4px;">Dress to Protect (5 factors)</a>
       </div>
     </div>
   </div>
 </main>
 
 <script>
-var uvLevels = [
-  { max: 2,  label: "Low",       color: "#4ade80" },
-  { max: 5,  label: "Moderate",  color: "#facc15" },
-  { max: 7,  label: "High",      color: "#fb923c" },
-  { max: 10, label: "Very High", color: "#f87171" },
-  { max: 20, label: "Extreme",   color: "#c084fc" }
-];
-function getLevel(uv) {
-  return uvLevels.find(function(l) { return uv <= l.max; }) || uvLevels[uvLevels.length - 1];
-}
-var slider = document.getElementById('uvSlider');
-if (slider) {
-  var uvNum = document.getElementById('uvNum');
-  var lvlDot = document.getElementById('levelDot');
-  var lvlText = document.getElementById('levelText');
-  slider.addEventListener('input', function() {
+(function() {
+  var uvLevels = [
+    { max: 2,  label: "Low",       color: "#4ade80" },
+    { max: 5,  label: "Moderate",  color: "#facc15" },
+    { max: 7,  label: "High",      color: "#fb923c" },
+    { max: 10, label: "Very High", color: "#f87171" },
+    { max: 20, label: "Extreme",   color: "#c084fc" }
+  ];
+  function getLevel(uv) {
+    return uvLevels.find(function(l) { return uv <= l.max; }) || uvLevels[uvLevels.length - 1];
+  }
+  function updateLevel() {
+    var slider = document.getElementById('uvSlider');
+    var uvNum = document.getElementById('uvNum');
+    var uvStripSub = document.getElementById('uvStripSub');
+    var lvlDot = document.getElementById('levelDot');
+    var lvlText = document.getElementById('levelText');
+    if (!slider) return;
     var uv = parseInt(slider.value, 10);
     var lvl = getLevel(uv);
-    if (uvNum) uvNum.textContent = 'UV ' + uv;
+    if (uvNum) {
+      uvNum.textContent = 'UV ' + uv;
+      uvNum.style.color = lvl.color;
+    }
+    if (uvStripSub) {
+      uvStripSub.textContent = lvl.label + ' — adjust slider for your conditions';
+      uvStripSub.style.color = lvl.color;
+    }
     if (lvlDot) lvlDot.style.background = lvl.color;
     if (lvlText) { lvlText.style.color = lvl.color; lvlText.textContent = lvl.label; }
-  });
-}
+    var calcUvInput = document.getElementById('calcUv');
+    if (calcUvInput) { calcUvInput.value = uv; runSunburnCalc(); }
+  }
+
+  var MED_BY_TYPE = [0, 200, 250, 300, 450, 600, 1000];
+  function runSunburnCalc() {
+    var uvEl = document.getElementById('calcUv');
+    var skinEl = document.getElementById('calcSkin');
+    var spfEl = document.getElementById('calcSpf');
+    var cloudEl = document.getElementById('calcCloud');
+    var outEl = document.getElementById('calcResultValue');
+    var resultBlock = document.getElementById('calcResult');
+    if (!outEl) return;
+    var uvi = parseFloat(String(uvEl && uvEl.value).replace(',', '.'), 10);
+    if (isNaN(uvi)) { outEl.textContent = '—'; if (resultBlock) resultBlock.style.display = ''; return; }
+    var uviEffective = uvi < 1 ? 1 : uvi;
+    var skinType = parseInt(skinEl && skinEl.value, 10) || 2;
+    skinType = Math.max(1, Math.min(6, skinType));
+    var spf = parseInt(spfEl && spfEl.value, 10) || 1;
+    spf = Math.min(50, Math.max(1, isNaN(spf) ? 1 : spf));
+    var cloud = parseFloat(cloudEl && cloudEl.value, 10);
+    if (isNaN(cloud) || cloud <= 0) cloud = 1;
+    var med = MED_BY_TYPE[skinType] || 250;
+    var irradiance = uviEffective * 0.025 * cloud;
+    if (irradiance <= 0) { outEl.textContent = '—'; return; }
+    var timeMinUnprotected = med / (irradiance * 60);
+    var spfMult = 1 + 0.8 * (spf - 1);
+    var timeMin = timeMinUnprotected * spfMult;
+    var resultText;
+    if (!isFinite(timeMin) || timeMin < 0) resultText = '—';
+    else if (timeMin >= 600) resultText = 'Over 10 hours';
+    else if (timeMin < 1) resultText = 'Under 1 min';
+    else if (timeMin < 60) resultText = Math.round(timeMin) + ' min';
+    else {
+      var hrs = Math.floor(timeMin / 60);
+      var mins = Math.round(timeMin % 60);
+      resultText = mins === 0 ? (hrs + ' hr') : (hrs + ' hr ' + mins + ' min');
+    }
+    outEl.textContent = resultText;
+    if (resultBlock) resultBlock.style.display = '';
+    outEl.setAttribute('aria-label', 'Time before burning: ' + resultText);
+  }
+
+  var slider = document.getElementById('uvSlider');
+  if (slider) {
+    slider.addEventListener('input', updateLevel);
+    updateLevel();
+  }
+  var calcBtn = document.getElementById('calcBtn');
+  if (calcBtn) calcBtn.addEventListener('click', function(e) { e.preventDefault(); runSunburnCalc(); });
+})();
 </script>
 </body>
 </html>
