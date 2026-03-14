@@ -270,6 +270,8 @@
       runSunburnCalc(uv);
 
       var hf = data.hourly_forecast || [];
+      var uvForecast = [];
+      
       for (var i = 0; i < hf.length; i++) {
         var item = hf[i];
         if (item.dt != null) {
