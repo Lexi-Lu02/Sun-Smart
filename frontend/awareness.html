@@ -4,9 +4,11 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>SunSmart | Awareness</title>
+
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;700;800&family=DM+Sans:wght@400;500;700&display=swap" rel="stylesheet">
+
   <link rel="stylesheet" href="css/style.css" />
   <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 </head>
@@ -21,13 +23,18 @@
     <div class="nav-user">A</div>
   </nav>
 
-  <main class="page active">>
+  <main class="page active">
     <div class="page-header">
       <div class="us-tag"><span class="badge">US2.1</span> Must Have</div>
       <h1 class="page-title">Understand UV Impacts and Skin Myths</h1>
       <p class="page-sub">
         Data visualisations help young adults understand the impact of skin cancer and heat trends in Australia, so they can make smarter sun-safety decisions.
       </p>
+
+      <div class="page-actions">
+        <button id="shareAwarenessBtn" class="action-btn">Share Awareness Page</button>
+        <span id="shareStatus" class="share-status"></span>
+      </div>
     </div>
 
     <section class="chart-grid">
@@ -36,6 +43,9 @@
         <p class="chart-desc">
           This chart shows the increase in skin cancer cases across age groups. It highlights why early awareness and prevention matter.
         </p>
+
+        <div id="skinCancerLoading" class="loading-text">Loading chart data...</div>
+        <div id="skinCancerError" class="error-text hidden">Failed to load skin cancer data.</div>
         <canvas id="skinCancerChart"></canvas>
       </div>
 
@@ -44,6 +54,9 @@
         <p class="chart-desc">
           Rising heat and strong UV conditions increase exposure risk, especially for young people spending more time outdoors.
         </p>
+
+        <div id="heatTrendLoading" class="loading-text">Loading chart data...</div>
+        <div id="heatTrendError" class="error-text hidden">Failed to load heat trend data.</div>
         <canvas id="heatTrendChart"></canvas>
       </div>
     </section>
@@ -51,56 +64,27 @@
     <section class="two-col">
       <div class="card">
         <div class="card-title">Common Skin Myths</div>
-        <div class="myth-list">
-          <div class="myth-item">
-            <div class="myth-badge">Myth</div>
-            <h3>“Cloudy days are safe.”</h3>
-            <p>UV radiation can still reach your skin even when the sky looks overcast.</p>
-          </div>
-
-          <div class="myth-item">
-            <div class="myth-badge">Myth</div>
-            <h3>“Only hot weather causes skin damage.”</h3>
-            <p>Heat and UV are different. A cool day can still have dangerous UV levels.</p>
-          </div>
-
-          <div class="myth-item">
-            <div class="myth-badge">Myth</div>
-            <h3>“Young people do not need daily protection.”</h3>
-            <p>UV damage builds over time, so habits formed young are important.</p>
-          </div>
+        <div class="myth-list" id="mythList">
+          <div class="loading-text">Loading myths...</div>
         </div>
       </div>
 
       <div class="card">
         <div class="card-title">Facts</div>
-        <div class="fact-list">
-          <div class="fact-item">
-            <div class="fact-badge">Fact</div>
-            <p>Skin damage can happen without immediate pain or visible redness.</p>
-          </div>
-
-          <div class="fact-item">
-            <div class="fact-badge">Fact</div>
-            <p>Australia’s UV index is often high enough to require protection for much of the year.</p>
-          </div>
-
-          <div class="fact-item">
-            <div class="fact-badge">Fact</div>
-            <p>Visual awareness helps people understand risk better than simple warnings alone.</p>
-          </div>
+        <div class="fact-list" id="factList">
+          <div class="loading-text">Loading facts...</div>
         </div>
 
         <div class="takeaway-card">
           <div class="card-title small">Key Takeaway</div>
-          <p>
-            By seeing the trends visually, users are more likely to understand why sun protection should become a regular habit rather than an occasional action.
+          <p id="keyTakeaway">
+            Loading takeaway...
           </p>
         </div>
       </div>
     </section>
   </main>
 
-  <script src="js/charts.js"></script>
+  <script src="js/awareness.js"></script>
 </body>
 </html>

@@ -1,15 +1,23 @@
-document.addEventListener("DOMContentLoaded", () => {
+document.addEventListener("DOMContentLoaded", async () => {
+
+  const API_BASE = "http://127.0.0.1:8000/api/awareness";
+
   const skinCtx = document.getElementById("skinCancerChart");
   const heatCtx = document.getElementById("heatTrendChart");
 
+  // Skin cancer chart
   if (skinCtx) {
+
+    const res = await fetch(`${API_BASE}/skin-cancer`);
+    const data = await res.json();
+
     new Chart(skinCtx, {
       type: "bar",
       data: {
-        labels: ["15–24", "25–34", "35–44", "45–54", "55+"],
+        labels: data.labels,
         datasets: [{
-          label: "Skin Cancer Impact (example data)",
-          data: [12, 18, 27, 35, 49],
+          label: data.datasetLabel || "Skin Cancer Impact",
+          data: data.values,
           borderWidth: 1
         }]
       },
@@ -35,14 +43,19 @@ document.addEventListener("DOMContentLoaded", () => {
     });
   }
 
+  // Heat trend chart
   if (heatCtx) {
+
+    const res = await fetch(`${API_BASE}/heat-trend`);
+    const data = await res.json();
+
     new Chart(heatCtx, {
       type: "line",
       data: {
-        labels: ["2019", "2020", "2021", "2022", "2023", "2024"],
+        labels: data.labels,
         datasets: [{
-          label: "Heat Trend in Australia (example data)",
-          data: [26.1, 26.4, 26.8, 27.2, 27.6, 28.1],
+          label: data.datasetLabel || "Heat Trend in Australia",
+          data: data.values,
           tension: 0.35,
           fill: false
         }]
@@ -67,4 +80,5 @@ document.addEventListener("DOMContentLoaded", () => {
       }
     });
   }
+
 });
