@@ -436,6 +436,10 @@
             return r.json();
           }).then(function(uvData) {
             updateUI(uvData);
+            if (typeof sessionStorage !== 'undefined' && uvData && typeof uvData.uv_index === 'number') {
+              sessionStorage.setItem('sunsmart_uv_index', String(uvData.uv_index));
+              sessionStorage.setItem('sunsmart_postcode', String(postcode));
+            }
           });
         })
         .catch(function(err) {
