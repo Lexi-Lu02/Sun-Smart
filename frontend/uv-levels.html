@@ -269,15 +269,19 @@
 
       runSunburnCalc(uv);
 
-      var uvForecast = [];
-      var today = new Date().toISOString().slice(0, 10);
       var hf = data.hourly_forecast || [];
       for (var i = 0; i < hf.length; i++) {
         var item = hf[i];
-        var hour = item.time ? parseInt(item.time, 10) : 12;
-        uvForecast.push({ uv: item.uv_index, uv_time: today + 'T' + (hour < 10 ? '0' : '') + hour + ':00:00' });
+        if (item.dt != null) {
+          uvForecast.push({
+            uv: typeof item.uv_index === 'number' ? item.uv_index : 0,
+            uv_time: new Date(item.dt * 1000).toISOString()
+          });
+        }
       }
-      if (uvForecast.length === 0) uvForecast.push({ uv: uv, uv_time: new Date().toISOString() });
+      if (uvForecast.length === 0) {
+        uvForecast.push({ uv: uv, uv_time: new Date().toISOString() });
+      }
       updateForecastUI(uv, uvForecast);
 
       var locLabel = document.getElementById('locationLabel').textContent || '';
