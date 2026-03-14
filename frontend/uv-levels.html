@@ -6,6 +6,10 @@
 <title>SunSmart — UV Levels</title>
 <link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;600;700;800&family=DM+Sans:ital,wght@0,300;0,400;0,500;1,400&display=swap" rel="stylesheet">
 <link rel="stylesheet" href="css/style.css">
+<!-- Postcode API (S3 + API Gateway): set base URL below, e.g. your API Gateway invoke URL with no trailing slash -->
+<script>
+  window.SUNSMART_API_BASE = window.SUNSMART_API_BASE || ''; // e.g. 'https://abc123.execute-api.ap-southeast-2.amazonaws.com'
+</script>
 </head>
 <body>
 
@@ -494,24 +498,9 @@
       });
   }
 
-  // Postcode lookup: load Australian postcodes and fetch UV by lat/lng from API
-  var postcodesByCode = {};
-
-  function loadPostcodes() {
-    return fetch('data/postcodes.json')
-      .then(function(res) {
-        if (!res.ok) throw new Error('Could not load postcodes.');
-        return res.json();
-      })
-      .then(function(arr) {
-        postcodesByCode = {};
-        for (var i = 0; i < arr.length; i++) {
-          var p = arr[i];
-          if (!postcodesByCode[p.postcode]) postcodesByCode[p.postcode] = p;
-        }
-        return postcodesByCode;
-      });
-  }
+  // Postcode lookup: request backend API (database on EC2) for lat/lng, then fetch UV
+  // Set window.SUNSMART_API_BASE to your backend URL if different origin (e.g. 'https://your-ec2:8000')
+  var POSTCODE_API_BASE = (typeof window !== 'undefined' && window.SUNSMART_API_BASE) ? window.SUNSMART_API_BASE : '';
 
   function lookupByPostcode() {
     var input = document.getElementById('postcodeInput');
@@ -524,25 +513,34 @@
       return;
     }
 
-    // Australian postcodes: 3 or 4 digits
     var postcode = raw.length <= 4 ? raw : raw.slice(0, 4);
-    var loc = postcodesByCode[postcode];
-    if (!loc && /^\d+$/.test(postcode)) {
-      // Try without leading zeros (e.g. 0810 -> 810)
-      loc = postcodesByCode[String(parseInt(postcode, 10))];
-    }
-    if (!loc) {
-      showError('Postcode "' + postcode + '" not found. Enter a valid Australian postcode.');
+    if (!/^\d+$/.test(postcode)) {
+      showError('Please enter a valid Australian postcode (digits only).');
       return;
     }
 
     clearError();
     btn.disabled = true;
     btn.textContent = 'Loading…';
-    var label = (loc.suburb || '') + (loc.state ? ', ' + loc.state : '');
-    fetchUv(loc.latitude, loc.longitude, label || ('Postcode ' + postcode));
-    btn.disabled = false;
-    btn.textContent = '📍 Get UV for postcode';
+
+    var url = POSTCODE_API_BASE + '/api/postcode/' + encodeURIComponent(postcode);
+    fetch(url)
+      .then(function(res) {
+        if (res.status === 404) throw new Error('Postcode not found.');
+        if (!res.ok) throw new Error('Could not look up postcode.');
+        return res.json();
+      })
+      .then(function(loc) {
+        var label = (loc.suburb || '') + (loc.state ? ', ' + loc.state : '') || ('Postcode ' + postcode);
+        fetchUv(loc.latitude, loc.longitude, label);
+      })
+      .catch(function(err) {
+        showError(err.message || 'Could not look up postcode. Check that the API is running.');
+      })
+      .finally(function() {
+        btn.disabled = false;
+        btn.textContent = '📍 Get UV for postcode';
+      });
   }
 
   function init() {
@@ -565,11 +563,6 @@
 
     runSunburnCalc();
     fetchUv(DEFAULT_LAT, DEFAULT_LNG, DEFAULT_LABEL);
-
-    // Load Australian postcodes for lookup (from data/reference/australian-postcodes.sql)
-    loadPostcodes().catch(function() {
-      showError('Could not load postcode data. Using default location.');
-    });
   }
 
   if (document.readyState === 'loading') {
