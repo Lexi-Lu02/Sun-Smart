@@ -4,7 +4,7 @@ from collections import defaultdict
 
 s3 = boto3.client("s3")
 
-BUCKET = "tp06-bucket1 "
+BUCKET = "tp06-bucket1"
 
 AGE_FILE = "2023-Cancer-incidence-by-age-groups.json"
 STATE_FILE = "2023-Cancer-incidence-by-state-and-territory.json"
@@ -103,9 +103,8 @@ def get_mortality():
     }
 
 
-# ------------------------------------------------
+
 # SUN PROTECTION
-# ------------------------------------------------
 
 def get_sunprotection():
 
