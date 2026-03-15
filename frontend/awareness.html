@@ -26,9 +26,9 @@
   <main class="page active">
     <div class="page-header">
       <div class="us-tag"><span class="badge">US2.1</span> Must Have</div>
-      <h1 class="page-title">Understand UV Impacts and Skin Myths</h1>
+      <h1 class="page-title">Understand UV Impacts and Skin Cancer Risk</h1>
       <p class="page-sub">
-        Data visualisations help young adults understand the impact of skin cancer and heat trends in Australia, so they can make smarter sun-safety decisions.
+        These visualisations help users understand skin cancer incidence and mortality in Australia, while also learning practical sun protection actions.
       </p>
 
       <div class="page-actions">
@@ -39,52 +39,51 @@
 
     <section class="chart-grid">
       <div class="card">
-        <div class="card-title">Skin Cancer Impact in Australia</div>
+        <div class="card-title">Cancer Incidence by Age Group</div>
         <p class="chart-desc">
-          This chart shows the increase in skin cancer cases across age groups. It highlights why early awareness and prevention matter.
+          This chart shows how cancer incidence varies across age groups.
         </p>
-
-        <div id="skinCancerLoading" class="loading-text">Loading chart data...</div>
-        <div id="skinCancerError" class="error-text hidden">Failed to load skin cancer data.</div>
-        <canvas id="skinCancerChart"></canvas>
+        <div id="ageLoading" class="loading-text">Loading chart data...</div>
+        <div id="ageError" class="error-text hidden">Failed to load age-group data.</div>
+        <canvas id="ageChart"></canvas>
       </div>
 
       <div class="card">
-        <div class="card-title">Heat Trend in Australia</div>
+        <div class="card-title">Cancer Incidence by State and Territory</div>
         <p class="chart-desc">
-          Rising heat and strong UV conditions increase exposure risk, especially for young people spending more time outdoors.
+          This chart compares incidence levels across Australian states and territories.
         </p>
-
-        <div id="heatTrendLoading" class="loading-text">Loading chart data...</div>
-        <div id="heatTrendError" class="error-text hidden">Failed to load heat trend data.</div>
-        <canvas id="heatTrendChart"></canvas>
+        <div id="stateLoading" class="loading-text">Loading chart data...</div>
+        <div id="stateError" class="error-text hidden">Failed to load state data.</div>
+        <canvas id="stateChart"></canvas>
       </div>
     </section>
 
     <section class="two-col">
       <div class="card">
-        <div class="card-title">Common Skin Myths</div>
-        <div class="myth-list" id="mythList">
-          <div class="loading-text">Loading myths...</div>
-        </div>
+        <div class="card-title">Cancer Mortality Overview</div>
+        <p class="chart-desc">
+          Mortality data highlights the seriousness of long-term cancer outcomes and reinforces the need for prevention and early awareness.
+        </p>
+        <div id="mortalityLoading" class="loading-text">Loading chart data...</div>
+        <div id="mortalityError" class="error-text hidden">Failed to load mortality data.</div>
+        <canvas id="mortalityChart"></canvas>
       </div>
 
       <div class="card">
-        <div class="card-title">Facts</div>
-        <div class="fact-list" id="factList">
-          <div class="loading-text">Loading facts...</div>
+        <div class="card-title">Sun Protection Tips</div>
+        <div class="fact-list" id="tipList">
+          <div class="loading-text">Loading tips...</div>
         </div>
 
         <div class="takeaway-card">
           <div class="card-title small">Key Takeaway</div>
-          <p id="keyTakeaway">
-            Loading takeaway...
-          </p>
+          <p id="keyTakeaway">Loading takeaway...</p>
         </div>
       </div>
     </section>
   </main>
 
-  <script src="js/awareness.js"></script>
+  <script src="js/charts.js"></script>
 </body>
 </html>

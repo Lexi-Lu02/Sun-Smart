@@ -1,26 +1,29 @@
 from fastapi import APIRouter
 from services.awareness import (
-    get_skin_cancer_data,
-    get_heat_trend_data,
-    get_awareness_content,
+    get_incidence_age,
+    get_incidence_state,
+    get_mortality,
+    get_sunprotection
 )
 
-router = APIRouter(
-    prefix="/api/awareness",
-    tags=["awareness"]
-)
+router = APIRouter(prefix="/api/awareness", tags=["awareness"])
 
 
-@router.get("/skin-cancer")
-def skin_cancer():
-    return get_skin_cancer_data()
+@router.get("/incidence-age")
+def incidence_age():
+    return get_incidence_age()
 
 
-@router.get("/heat-trend")
-def heat_trend():
-    return get_heat_trend_data()
+@router.get("/incidence-state")
+def incidence_state():
+    return get_incidence_state()
 
 
-@router.get("/content")
-def content():
-    return get_awareness_content()
+@router.get("/mortality")
+def mortality():
+    return get_mortality()
+
+
+@router.get("/sunprotection")
+def sunprotection():
+    return get_sunprotection()

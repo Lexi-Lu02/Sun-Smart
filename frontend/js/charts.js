@@ -1,84 +1,86 @@
-document.addEventListener("DOMContentLoaded", async () => {
+const API = "http://16.176.142.118:8000/api/awareness"
 
-  const API_BASE = "http://127.0.0.1:8000/api/awareness";
+document.addEventListener("DOMContentLoaded", () => {
 
-  const skinCtx = document.getElementById("skinCancerChart");
-  const heatCtx = document.getElementById("heatTrendChart");
+  loadAgeChart()
+  loadStateChart()
+  loadMortalityChart()
+  loadTips()
 
-  // Skin cancer chart
-  if (skinCtx) {
+})
 
-    const res = await fetch(`${API_BASE}/skin-cancer`);
-    const data = await res.json();
+async function loadAgeChart(){
 
-    new Chart(skinCtx, {
-      type: "bar",
-      data: {
-        labels: data.labels,
-        datasets: [{
-          label: data.datasetLabel || "Skin Cancer Impact",
-          data: data.values,
-          borderWidth: 1
-        }]
-      },
-      options: {
-        responsive: true,
-        plugins: {
-          legend: {
-            labels: { color: "#eef2ff" }
-          }
-        },
-        scales: {
-          x: {
-            ticks: { color: "#9fb0cf" },
-            grid: { color: "rgba(255,255,255,0.08)" }
-          },
-          y: {
-            beginAtZero: true,
-            ticks: { color: "#9fb0cf" },
-            grid: { color: "rgba(255,255,255,0.08)" }
-          }
-        }
-      }
-    });
-  }
+  const res = await fetch(`${API}/incidence-age`)
+  const data = await res.json()
 
-  // Heat trend chart
-  if (heatCtx) {
+  new Chart(document.getElementById("ageChart"), {
+    type: "bar",
+    data: {
+      labels: data.labels,
+      datasets: [{
+        label: data.datasetLabel,
+        data: data.values
+      }]
+    }
+  })
+}
 
-    const res = await fetch(`${API_BASE}/heat-trend`);
-    const data = await res.json();
+async function loadStateChart(){
 
-    new Chart(heatCtx, {
-      type: "line",
-      data: {
-        labels: data.labels,
-        datasets: [{
-          label: data.datasetLabel || "Heat Trend in Australia",
-          data: data.values,
-          tension: 0.35,
-          fill: false
-        }]
-      },
-      options: {
-        responsive: true,
-        plugins: {
-          legend: {
-            labels: { color: "#eef2ff" }
-          }
-        },
-        scales: {
-          x: {
-            ticks: { color: "#9fb0cf" },
-            grid: { color: "rgba(255,255,255,0.08)" }
-          },
-          y: {
-            ticks: { color: "#9fb0cf" },
-            grid: { color: "rgba(255,255,255,0.08)" }
-          }
-        }
-      }
-    });
-  }
+  const res = await fetch(`${API}/incidence-state`)
+  const data = await res.json()
 
-});
+  new Chart(document.getElementById("stateChart"), {
+    type: "bar",
+    data: {
+      labels: data.labels,
+      datasets: [{
+        label: data.datasetLabel,
+        data: data.values
+      }]
+    }
+  })
+}
+
+async function loadMortalityChart(){
+
+  const res = await fetch(`${API}/mortality`)
+  const data = await res.json()
+
+  new Chart(document.getElementById("mortalityChart"), {
+    type: "line",
+    data: {
+      labels: data.labels,
+      datasets: [{
+        label: data.datasetLabel,
+        data: data.values
+      }]
+    }
+  })
+}
+
+async function loadTips(){
+
+  const res = await fetch(`${API}/sunprotection`)
+  const data = await res.json()
+
+  const container = document.getElementById("tipList")
+  container.innerHTML = ""
+
+  data.tips.forEach(tip => {
+
+    const div = document.createElement("div")
+    div.className = "fact-item"
+
+    div.innerHTML = `
+      <div class="fact-badge">Tip</div>
+      <p>${tip}</p>
+    `
+
+    container.appendChild(div)
+
+  })
+
+  document.getElementById("keyTakeaway").innerText = data.takeaway
+}
