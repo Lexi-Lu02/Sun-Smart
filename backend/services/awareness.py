@@ -1,83 +1,126 @@
-from flask import Flask, jsonify
-from flask_cors import CORS
+import json
+import boto3
+from collections import defaultdict
 
-app = Flask(__name__)
-CORS(app)  # 允许前端跨域访问
+s3 = boto3.client("s3")
+
+BUCKET = "tp06-bucket1 "
+
+AGE_FILE = "2023-Cancer-incidence-by-age-groups.json"
+STATE_FILE = "2023-Cancer-incidence-by-state-and-territory.json"
+MORTALITY_FILE = "2023-Cancer-mortality.json"
+SUN_FILE = "cleaned_sunprotection.json"
 
 
-@app.route("/")
-def home():
-    return jsonify({
-        "message": "SunSmart Awareness API is running."
-    })
+def read_s3(key):
+    obj = s3.get_object(Bucket=BUCKET, Key=key)
+    return json.loads(obj["Body"].read())
 
+# AGE INCIDENCE
 
-@app.route("/api/awareness/skin-cancer", methods=["GET"])
-def get_skin_cancer_data():
-    """
-    返回皮肤癌影响图表数据
-    前端对应:
-    - labels
-    - values
-    - datasetLabel
-    """
-    data = {
-        "labels": ["15-24", "25-34", "35-44", "45-54", "55+"],
-        "values": [1200, 2400, 3900, 5200, 6800],
-        "datasetLabel": "Estimated Cases"
+def get_incidence_age():
+
+    data = read_s3(AGE_FILE)
+
+    result = defaultdict(int)
+
+    for row in data:
+
+        if row["Year"] != "2023":
+            continue
+
+        if row["Sex"] != "Persons":
+            continue
+
+        age = row["Age group (years)"]
+        count = int(row["Count"] or 0)
+
+        result[age] += count
+
+    labels = list(result.keys())
+    values = list(result.values())
+
+    return {
+        "labels": labels,
+        "values": values,
+        "datasetLabel": "Cancer Incidence by Age Group (2023)"
     }
-    return jsonify(data)
 
 
-@app.route("/api/awareness/heat-trend", methods=["GET"])
-def get_heat_trend_data():
-    """
-    返回热趋势图表数据
-    前端对应:
-    - labels
-    - values
-    - datasetLabel
-    """
-    data = {
-        "labels": ["2019", "2020", "2021", "2022", "2023", "2024"],
-        "values": [29.1, 29.4, 29.8, 30.2, 30.5, 31.0],
-        "datasetLabel": "Average Summer Temperature (°C)"
+# STATE INCIDENCE
+
+def get_incidence_state():
+
+    data = read_s3(STATE_FILE)
+
+    result = defaultdict(int)
+
+    for row in data:
+
+        if row["Year"] != "2023":
+            continue
+
+        if row["Sex"] != "Persons":
+            continue
+
+        state = row["State or Territory"]
+        count = int(row["Count"] or 0)
+
+        result[state] += count
+
+    return {
+        "labels": list(result.keys()),
+        "values": list(result.values()),
+        "datasetLabel": "Cancer Incidence by State (2023)"
     }
-    return jsonify(data)
 
 
-@app.route("/api/awareness/content", methods=["GET"])
-def get_awareness_content():
-    """
-    返回 myths / facts / takeaway
-    """
-    data = {
-        "myths": [
-            {
-                "title": "Cloudy days are safe.",
-                "description": "UV radiation can still reach your skin even when the sky looks overcast."
-            },
-            {
-                "title": "Only hot weather causes skin damage.",
-                "description": "Heat and UV are different. A cool day can still have dangerous UV levels."
-            },
-            {
-                "title": "Young people do not need daily protection.",
-                "description": "UV damage builds over time, so protective habits should start early."
-            }
-        ],
-        "facts": [
-            "Skin damage can happen without immediate pain or visible redness.",
-            "Australia’s UV index is often high enough to require protection for much of the year.",
-            "Visual awareness helps people understand risk better than simple warnings alone."
-        ],
-        "takeaway": (
-            "By seeing the trends visually, users are more likely to treat sun protection "
-            "as a regular habit rather than an occasional action."
-        )
+# MORTALITY
+
+def get_mortality():
+
+    data = read_s3(MORTALITY_FILE)
+
+    result = defaultdict(int)
+
+    for row in data:
+
+        if row["Year"] != "2023":
+            continue
+
+        if row["Sex"] != "Persons":
+            continue
+
+        age = row["Age group (years)"]
+        count = int(row["Count"] or 0)
+
+        result[age] += count
+
+    return {
+        "labels": list(result.keys()),
+        "values": list(result.values()),
+        "datasetLabel": "Cancer Mortality by Age (2023)"
     }
-    return jsonify(data)
 
 
-if __name__ == "__main__":
-    app.run(host="0.0.0.0", port=5000, debug=True)
+# ------------------------------------------------
+# SUN PROTECTION
+# ------------------------------------------------
+
+def get_sunprotection():
+
+    data = read_s3(SUN_FILE)
+
+    labels = []
+    values = []
+
+    for row in data[:10]:
+
+        labels.append(row["metric"])
+        values.append(row["value"])
+
+    return {
+        "labels": labels,
+        "values": values,
+        "datasetLabel": "Sun Protection Behaviour"
+    }
