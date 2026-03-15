@@ -13,113 +13,107 @@ SUN_FILE = "cleaned_sunprotection.json"
 
 
 def read_s3(key):
+    print(f"Reading {key} from S3...")
     obj = s3.get_object(Bucket=BUCKET, Key=key)
-    return json.loads(obj["Body"].read())
+    data = obj["Body"].read()
+    print(f"{key} size: {len(data)} bytes")
+    return json.loads(data)
 
-# AGE INCIDENCE
+
+# globle preloading
+AGE_DATA = read_s3(AGE_FILE)
+STATE_DATA = read_s3(STATE_FILE)
+MORTALITY_DATA = read_s3(MORTALITY_FILE)
+SUN_DATA = read_s3(SUN_FILE)
+
 
 def get_incidence_age():
-
-    data = read_s3(AGE_FILE)
-
+    data = AGE_DATA
     result = defaultdict(int)
 
     for row in data:
-
         if row["Year"] != "2023":
             continue
-
         if row["Sex"] != "Persons":
             continue
 
-        age = row["Age group (years)"]
-        count = int(row["Count"] or 0)
-
+        age = row["Age group"]
+        count = int(row["Count"])
         result[age] += count
 
-    labels = list(result.keys())
-    values = list(result.values())
+    return result
 
-    return {
-        "labels": labels,
-        "values": values,
-        "datasetLabel": "Cancer Incidence by Age Group (2023)"
-    }
-
-
-# STATE INCIDENCE
 
 def get_incidence_state():
-
-    data = read_s3(STATE_FILE)
-
+    data = STATE_DATA
     result = defaultdict(int)
 
     for row in data:
-
         if row["Year"] != "2023":
             continue
-
         if row["Sex"] != "Persons":
             continue
 
-        state = row["State or Territory"]
-        count = int(row["Count"] or 0)
-
+        state = row["State or territory"]
+        count = int(row["Count"])
         result[state] += count
 
-    return {
-        "labels": list(result.keys()),
-        "values": list(result.values()),
-        "datasetLabel": "Cancer Incidence by State (2023)"
-    }
+    return result
 
-
-# MORTALITY
 
 def get_mortality():
-
-    data = read_s3(MORTALITY_FILE)
-
+    data = MORTALITY_DATA
     result = defaultdict(int)
 
     for row in data:
-
         if row["Year"] != "2023":
             continue
-
         if row["Sex"] != "Persons":
             continue
 
-        age = row["Age group (years)"]
-        count = int(row["Count"] or 0)
+        cancer = row["Cancer type"]
+        count = int(row["Count"])
+        result[cancer] += count
 
-        result[age] += count
+    return result
+
+
+def get_sun_data():
+    return SUN_DATA
+
+
+def lambda_handler(event, context):
+    path = event.get("rawPath", "")
+
+    if path == "/incidence-age":
+        return {
+            "statusCode": 200,
+            "headers": {"Content-Type": "application/json"},
+            "body": json.dumps(get_incidence_age())
+        }
+
+    elif path == "/incidence-state":
+        return {
+            "statusCode": 200,
+            "headers": {"Content-Type": "application/json"},
+            "body": json.dumps(get_incidence_state())
+        }
+
+    elif path == "/mortality":
+        return {
+            "statusCode": 200,
+            "headers": {"Content-Type": "application/json"},
+            "body": json.dumps(get_mortality())
+        }
+
+    elif path == "/sun":
+        return {
+            "statusCode": 200,
+            "headers": {"Content-Type": "application/json"},
+            "body": json.dumps(get_sun_data())
+        }
 
     return {
-        "labels": list(result.keys()),
-        "values": list(result.values()),
-        "datasetLabel": "Cancer Mortality by Age (2023)"
-    }
-
-
-
-# SUN PROTECTION
-
-def get_sunprotection():
-
-    data = read_s3(SUN_FILE)
-
-    labels = []
-    values = []
-
-    for row in data[:10]:
-
-        labels.append(row["metric"])
-        values.append(row["value"])
-
-    return {
-        "labels": labels,
-        "values": values,
-        "datasetLabel": "Sun Protection Behaviour"
+        "statusCode": 404,
+        "body": json.dumps({"error": "Not found"})
     }
