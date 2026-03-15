@@ -1584,6 +1584,38 @@ svg {
   color: var(--muted);
 }
 
+.page-actions {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  margin-top: 18px;
+}
+
+.action-btn {
+  border: 1px solid rgba(255,255,255,0.12);
+  background: linear-gradient(135deg, #1c2740, #24304a);
+  color: #eef2ff;
+  padding: 10px 16px;
+  border-radius: 999px;
+  font-family: "DM Sans", sans-serif;
+  font-size: 14px;
+  font-weight: 700;
+  cursor: pointer;
+  transition: 0.2s ease;
+}
+
+.action-btn:hover {
+  transform: translateY(-1px);
+  border-color: rgba(255,255,255,0.22);
+  background: linear-gradient(135deg, #24304a, #2d3a59);
+}
+
+.share-status {
+  font-size: 14px;
+  color: #9fb0cf;
+  min-height: 20px;
+}
+
 /* =========================
    13) Responsive
    ========================= */
