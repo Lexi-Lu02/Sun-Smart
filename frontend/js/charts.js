@@ -243,3 +243,32 @@ async function loadTips() {
     }
   }
 }
+// share button
+const shareBtn = document.getElementById("shareAwarenessBtn");
+const shareStatus = document.getElementById("shareStatus");
+
+if (shareBtn) {
+  shareBtn.addEventListener("click", async () => {
+    const shareData = {
+      title: document.title,
+      text: "Check out this SunSmart awareness page.",
+      url: window.location.href
+    };
+
+    try {
+      if (navigator.share) {
+        await navigator.share(shareData);
+        shareStatus.textContent = "Page shared.";
+      } else {
+        await navigator.clipboard.writeText(window.location.href);
+        shareStatus.textContent = "Link copied!";
+      }
+    } catch (error) {
+      shareStatus.textContent = "Share cancelled.";
+    }
+
+    setTimeout(() => {
+      shareStatus.textContent = "";
+    }, 2500);
+  });
+}
