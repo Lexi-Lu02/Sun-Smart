@@ -1,10 +1,11 @@
-const API = " https://md4j1zjxb7.execute-api.ap-southeast-2.amazonaws.com/default/sunsmart-data-api";
+const API = "https://md4j1zjxb7.execute-api.ap-southeast-2.amazonaws.com/default/sunsmart-data-api";
 
 document.addEventListener("DOMContentLoaded", () => {
   loadAgeChart();
   loadStateChart();
   loadMortalityChart();
   loadTips();
+  initShareButton();
 });
 
 async function fetchJson(type) {
@@ -20,11 +21,6 @@ async function fetchJson(type) {
 function hideElement(id) {
   const el = document.getElementById(id);
   if (el) el.style.display = "none";
-}
-
-function showElement(id, display = "block") {
-  const el = document.getElementById(id);
-  if (el) el.style.display = display;
 }
 
 function showError(id) {
@@ -243,11 +239,13 @@ async function loadTips() {
     }
   }
 }
-// share button
-const shareBtn = document.getElementById("shareAwarenessBtn");
-const shareStatus = document.getElementById("shareStatus");
 
-if (shareBtn) {
+function initShareButton() {
+  const shareBtn = document.getElementById("shareAwarenessBtn");
+  const shareStatus = document.getElementById("shareStatus");
+
+  if (!shareBtn || !shareStatus) return;
+
   shareBtn.addEventListener("click", async () => {
     const shareData = {
       title: document.title,
