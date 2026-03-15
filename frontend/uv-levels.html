@@ -90,12 +90,11 @@
           <strong id="burnMsgStrong">—</strong>
         </p>
       </div>
-      <div>
-        <div class="burn-label">Time to damage</div>
-        <div class="burn-row">
-          <div class="burn-bar-bg"><div class="burn-bar-fill" id="burnBarFill"></div></div>
-          <span class="burn-time" id="burnTime">— min left</span>
-        </div>
+      <div class="risk-card-icons" aria-label="Sun protection reminders">
+        <img src="images/sun-stroke.png" alt="Sun exposure risk" class="risk-icon" title="Sun exposure risk">
+        <img src="images/clothing.png" alt="Protective clothing" class="risk-icon" title="Protective clothing">
+        <img src="images/ultraviolet.png" alt="UV protection" class="risk-icon" title="UV protection">
+        <img src="images/headwear.png" alt="Headwear protection" class="risk-icon" title="Headwear protection">
       </div>
     </div>
   </div>
@@ -245,12 +244,6 @@
       pointer.style.left = pctClamped + '%';
       pointer.style.transform = 'translateX(-50%)';
 
-      var burnTimeText = data.burn_time_minutes != null && data.burn_time_minutes < 999 ? (data.burn_time_minutes + ' min left') : (data.burn_time_minutes >= 999 ? '—' : 'Seek shade');
-      var burnFill = data.burn_time_minutes != null && data.burn_time_minutes < 999 ? Math.max(15, 100 - (data.burn_time_minutes / 6)) : 90;
-      document.getElementById('burnTime').textContent = burnTimeText;
-      document.getElementById('burnBarFill').style.width = burnFill + '%';
-      document.getElementById('burnBarFill').style.background = level.color;
-
       var warning = getWarningContent(level);
       document.getElementById('alertLabel').textContent = warning.title;
       document.getElementById('alertLabel').style.color = level.color;
@@ -271,7 +264,7 @@
 
       var hf = data.hourly_forecast || [];
       var uvForecast = [];
-      
+
       for (var i = 0; i < hf.length; i++) {
         var item = hf[i];
         if (item.dt != null) {
@@ -385,18 +378,6 @@
         outEl.setAttribute('aria-label', 'Time before burning: ' + resultText);
       }
 
-      var burnBarFill = document.getElementById('burnBarFill');
-      var burnTime = document.getElementById('burnTime');
-      if (burnBarFill && burnTime) {
-        var fillPct = 0;
-        if (isFinite(timeMin) && timeMin >= 0) {
-          if (timeMin >= 600) fillPct = 100;
-          else if (timeMin >= 1) fillPct = (timeMin / 600) * 100;
-        }
-        burnBarFill.style.width = fillPct + '%';
-        burnBarFill.style.background = 'var(--green, #4ade80)';
-        burnTime.textContent = resultText;
-      }
     }
   
     function setLocationLabel(label) {

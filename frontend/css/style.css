@@ -345,6 +345,10 @@ svg {
   gap: 18px;
 }
 
+.two-col {
+  margin-top: 20px;
+}
+
 .card-grid-3,
 .myths-row,
 .rec-grid {
@@ -451,6 +455,20 @@ svg {
 .alert-msg strong {
   color: var(--orange);
   font-weight: 700;
+}
+
+.risk-card-icons {
+  display: flex;
+  align-items: center;
+  justify-content: flex-start;
+  gap: 16px;
+  margin-top: 14px;
+}
+
+.risk-card-icons .risk-icon {
+  width: 100px;
+  height: 100px;
+  object-fit: contain;
 }
 
 .postcode-lookup {
