@@ -20,100 +20,149 @@ def read_s3(key):
     return json.loads(data)
 
 
-# globle preloading
+# global preloading
 AGE_DATA = read_s3(AGE_FILE)
 STATE_DATA = read_s3(STATE_FILE)
 MORTALITY_DATA = read_s3(MORTALITY_FILE)
 SUN_DATA = read_s3(SUN_FILE)
 
 
+def make_response(data, status_code=200):
+    return {
+        "statusCode": status_code,
+        "headers": {
+            "Content-Type": "application/json",
+            "Access-Control-Allow-Origin": "*",
+            "Access-Control-Allow-Methods": "GET, OPTIONS",
+            "Access-Control-Allow-Headers": "Content-Type"
+        },
+        "body": json.dumps(data)
+    }
+
+
 def get_incidence_age():
-    data = AGE_DATA
     result = defaultdict(int)
 
-    for row in data:
-        if row["Year"] != "2023":
+    for row in AGE_DATA:
+        if row.get("Year") != "2023":
             continue
-        if row["Sex"] != "Persons":
+        if row.get("Sex") != "Persons":
             continue
 
-        age = row["Age group"]
-        count = int(row["Count"])
-        result[age] += count
+        age = row.get("Age group", "Unknown")
+        count = row.get("Count", 0)
 
-    return result
+        try:
+            result[age] += int(count)
+        except:
+            continue
+
+    return {
+        "labels": list(result.keys()),
+        "values": list(result.values()),
+        "datasetLabel": "Cancer incidence by age group"
+    }
 
 
 def get_incidence_state():
-    data = STATE_DATA
     result = defaultdict(int)
 
-    for row in data:
-        if row["Year"] != "2023":
+    for row in STATE_DATA:
+        if row.get("Year") != "2023":
             continue
-        if row["Sex"] != "Persons":
+        if row.get("Sex") != "Persons":
             continue
 
-        state = row["State or territory"]
-        count = int(row["Count"])
-        result[state] += count
+        state = row.get("State or territory", "Unknown")
+        count = row.get("Count", 0)
 
-    return result
+        try:
+            result[state] += int(count)
+        except:
+            continue
+
+    return {
+        "labels": list(result.keys()),
+        "values": list(result.values()),
+        "datasetLabel": "Cancer incidence by state and territory"
+    }
 
 
 def get_mortality():
-    data = MORTALITY_DATA
     result = defaultdict(int)
 
-    for row in data:
-        if row["Year"] != "2023":
+    for row in MORTALITY_DATA:
+        if row.get("Year") != "2023":
             continue
-        if row["Sex"] != "Persons":
+        if row.get("Sex") != "Persons":
             continue
 
-        cancer = row["Cancer type"]
-        count = int(row["Count"])
-        result[cancer] += count
+        cancer = row.get("Cancer type", "Unknown")
+        count = row.get("Count", 0)
 
-    return result
+        try:
+            result[cancer] += int(count)
+        except:
+            continue
+
+    return {
+        "labels": list(result.keys()),
+        "values": list(result.values()),
+        "datasetLabel": "Cancer mortality"
+    }
 
 
 def get_sun_data():
-    return SUN_DATA
+    tips = []
+    takeaway = "Stay sun safe with sunscreen, shade, hats, and protective clothing."
+
+    if isinstance(SUN_DATA, list):
+        for row in SUN_DATA[:5]:
+            if isinstance(row, dict):
+                text = row.get("Tip") or row.get("tip") or row.get("Message") or row.get("message")
+                if text:
+                    tips.append(text)
+
+    if not tips:
+        tips = [
+            "Use SPF 30+ sunscreen.",
+            "Wear protective clothing.",
+            "Seek shade during peak UV hours.",
+            "Use sunglasses and a hat."
+        ]
+
+    return {
+        "tips": tips,
+        "takeaway": takeaway
+    }
 
 
 def lambda_handler(event, context):
-    path = event.get("rawPath", "")
+    print("EVENT:", json.dumps(event))
 
-    if path == "/incidence-age":
-        return {
-            "statusCode": 200,
-            "headers": {"Content-Type": "application/json"},
-            "body": json.dumps(get_incidence_age())
-        }
+    request_context = event.get("requestContext", {})
+    http_method = request_context.get("http", {}).get("method", "")
 
-    elif path == "/incidence-state":
-        return {
-            "statusCode": 200,
-            "headers": {"Content-Type": "application/json"},
-            "body": json.dumps(get_incidence_state())
-        }
+    # CORS preflight
+    if http_method == "OPTIONS":
+        return make_response({"message": "CORS OK"})
 
-    elif path == "/mortality":
-        return {
-            "statusCode": 200,
-            "headers": {"Content-Type": "application/json"},
-            "body": json.dumps(get_mortality())
-        }
+    query_params = event.get("queryStringParameters") or {}
+    data_type = query_params.get("type", "")
 
-    elif path == "/sun":
-        return {
-            "statusCode": 200,
-            "headers": {"Content-Type": "application/json"},
-            "body": json.dumps(get_sun_data())
-        }
+    if data_type == "age":
+        return make_response(get_incidence_age())
 
-    return {
-        "statusCode": 404,
-        "body": json.dumps({"error": "Not found"})
-    }
+    elif data_type == "state":
+        return make_response(get_incidence_state())
+
+    elif data_type == "mortality":
+        return make_response(get_mortality())
+
+    elif data_type == "sun":
+        return make_response(get_sun_data())
+
+    return make_response({
+        "error": "Invalid type",
+        "supported_types": ["age", "state", "mortality", "sun"]
+    }, 400)
