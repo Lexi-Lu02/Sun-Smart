@@ -6,7 +6,6 @@
 <title>SunSmart — UV Levels</title>
 <link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;600;700;800&family=DM+Sans:ital,wght@0,300;0,400;0,500;1,400&display=swap" rel="stylesheet">
 <link rel="stylesheet" href="css/style.css">
-<!-- Postcode API (S3 + API Gateway): set base URL below, e.g. your API Gateway invoke URL with no trailing slash -->
 <script>
   window.SUNSMART_API_BASE = 'https://aaj9607dn4.execute-api.ap-southeast-2.amazonaws.com';
 </script>
@@ -102,7 +101,6 @@
   <div class="card" id="forecastCard" style="margin-bottom:20px;display:none;">
     <div class="card-title">Next 24h UV Forecast</div>
     <div class="forecast-row" id="forecastRow">
-      <!-- Filled by API -->
     </div>
   </div>
 
@@ -395,12 +393,92 @@
     }
   
     var API_BASE = (typeof window !== 'undefined' && window.SUNSMART_API_BASE) ? window.SUNSMART_API_BASE : '';
+
+    window.__sunSmartUvCache = window.__sunSmartUvCache || {};
+    var UV_CACHE_TTL_MS = 10 * 60 * 1000; // 10 minutes
+
+    function getUvCacheKey(postcode) {
+      return 'sunsmart_uv_cache:' + String(postcode).trim();
+    }
+
+    function readUvCache(postcode) {
+      var key = getUvCacheKey(postcode);
+      var now = Date.now();
+
+      // 1) memory first
+      var mem = window.__sunSmartUvCache[key];
+      if (mem && mem.ts && (now - mem.ts < UV_CACHE_TTL_MS)) {
+        return mem.data;
+      }
+
+      // 2) sessionStorage fallback
+      try {
+        var raw = sessionStorage.getItem(key);
+        if (!raw) return null;
+
+        var parsed = JSON.parse(raw);
+        if (!parsed || !parsed.ts || !parsed.data) return null;
+
+        if (now - parsed.ts >= UV_CACHE_TTL_MS) {
+          sessionStorage.removeItem(key);
+          return null;
+        }
+
+        // refill memory
+        window.__sunSmartUvCache[key] = parsed;
+        return parsed.data;
+      } catch (e) {
+        return null;
+      }
+    }
+
+    function writeUvCache(postcode, data) {
+      var key = getUvCacheKey(postcode);
+      var payload = {
+        ts: Date.now(),
+        data: data
+      };
+
+      // write memory
+      window.__sunSmartUvCache[key] = payload;
+
+      // write sessionStorage
+      try {
+        sessionStorage.setItem(key, JSON.stringify(payload));
+      } catch (e) {}
+    }
+
+    function rememberLastLookup(postcode) {
+      try {
+        sessionStorage.setItem('sunsmart_last_postcode', String(postcode));
+      } catch (e) {}
+    }
+
+    function getLastLookupPostcode() {
+      try {
+        return sessionStorage.getItem('sunsmart_last_postcode');
+      } catch (e) {
+        return null;
+      }
+    }
   
     function fetchUvByPostcode(postcode, fallbackLabel) {
       clearError();
 
+      // 1) try cache first
+      var cached = readUvCache(postcode);
+      if (cached) {
+        var cachedLabel = ((cached.suburb || '') + (cached.state ? ', ' + cached.state : '')).trim();
+        setLocationLabel(cachedLabel || fallbackLabel || ('Postcode ' + postcode));
+        updateUI(cached);
+        rememberLastLookup(postcode);
+        return Promise.resolve(cached);
+      }
+
+      // 2) fetch postcode
       var postcodeUrl = API_BASE + '/api/postcode/' + encodeURIComponent(postcode);
-      fetch(postcodeUrl)
+
+      return fetch(postcodeUrl)
         .then(function(res) {
           if (res.status === 404) throw new Error('Postcode not found.');
           if (!res.ok) throw new Error('Could not load postcode.');
@@ -409,22 +487,38 @@
         .then(function(postcodeData) {
           var label = ((postcodeData.suburb || '') + (postcodeData.state ? ', ' + postcodeData.state : '')).trim();
           setLocationLabel(label || fallbackLabel || ('Postcode ' + postcode));
+
           var lat = postcodeData.latitude;
           var lng = postcodeData.longitude;
           var uvUrl = API_BASE + '/api/uv/current?lat=' + encodeURIComponent(lat) + '&lon=' + encodeURIComponent(lng);
-          return fetch(uvUrl).then(function(r) {
-            if (!r.ok) throw new Error('Could not load UV and conditions.');
-            return r.json();
-          }).then(function(uvData) {
-            updateUI(uvData);
-            if (typeof sessionStorage !== 'undefined' && uvData && typeof uvData.uv_index === 'number') {
-              sessionStorage.setItem('sunsmart_uv_index', String(uvData.uv_index));
-              sessionStorage.setItem('sunsmart_postcode', String(postcode));
-            }
-          });
+
+          return fetch(uvUrl)
+            .then(function(r) {
+              if (!r.ok) throw new Error('Could not load UV and conditions.');
+              return r.json();
+            })
+            .then(function(uvData) {
+              // merge postcode + uv result
+              var merged = Object.assign({}, postcodeData, uvData);
+
+              updateUI(merged);
+
+              // full cache
+              writeUvCache(postcode, merged);
+              rememberLastLookup(postcode);
+
+              // keep old compatibility keys if you still want them
+              if (typeof sessionStorage !== 'undefined' && uvData && typeof uvData.uv_index === 'number') {
+                sessionStorage.setItem('sunsmart_uv_index', String(uvData.uv_index));
+                sessionStorage.setItem('sunsmart_postcode', String(postcode));
+              }
+
+              return merged;
+            });
         })
         .catch(function(err) {
           showError(err.message || 'Could not load UV data.');
+          throw err;
         });
     }
   
@@ -448,20 +542,19 @@
       btn.disabled = true;
       btn.textContent = 'Loading…';
   
-      fetchUvByPostcode(postcode, 'Postcode ' + postcode);
-  
-      setTimeout(function() {
-        btn.disabled = false;
-        btn.textContent = '📍 Get UV for postcode';
-      }, 800);
+      fetchUvByPostcode(postcode, 'Postcode ' + postcode)
+        .finally(function() {
+          btn.disabled = false;
+          btn.textContent = '📍 Get UV for postcode';
+        });
     }
-  
+
     function init() {
       var lookupBtn = document.getElementById('lookupPostcodeBtn');
       var postcodeInput = document.getElementById('postcodeInput');
-  
+
       if (lookupBtn) lookupBtn.addEventListener('click', lookupByPostcode);
-  
+
       if (postcodeInput) {
         postcodeInput.addEventListener('keydown', function(e) {
           if (e.key === 'Enter') {
@@ -470,8 +563,13 @@
           }
         });
       }
-  
-      fetchUvByPostcode(DEFAULT_POSTCODE, DEFAULT_LABEL);
+
+      var initialPostcode = getLastLookupPostcode() || DEFAULT_POSTCODE;
+      if (postcodeInput) {
+        postcodeInput.value = initialPostcode;
+      }
+
+      fetchUvByPostcode(initialPostcode, DEFAULT_LABEL);
     }
   
     if (document.readyState === 'loading') {
