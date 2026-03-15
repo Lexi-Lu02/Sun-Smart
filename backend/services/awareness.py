@@ -20,11 +20,24 @@ def read_s3(key):
     return json.loads(data)
 
 
-# global preloading
+# preload data once per container
 AGE_DATA = read_s3(AGE_FILE)
 STATE_DATA = read_s3(STATE_FILE)
 MORTALITY_DATA = read_s3(MORTALITY_FILE)
 SUN_DATA = read_s3(SUN_FILE)
+
+# debug logs
+print("AGE sample:", AGE_DATA[0] if AGE_DATA else "empty")
+print("AGE keys:", list(AGE_DATA[0].keys()) if AGE_DATA and isinstance(AGE_DATA[0], dict) else "no keys")
+
+print("STATE sample:", STATE_DATA[0] if STATE_DATA else "empty")
+print("STATE keys:", list(STATE_DATA[0].keys()) if STATE_DATA and isinstance(STATE_DATA[0], dict) else "no keys")
+
+print("MORTALITY sample:", MORTALITY_DATA[0] if MORTALITY_DATA else "empty")
+print("MORTALITY keys:", list(MORTALITY_DATA[0].keys()) if MORTALITY_DATA and isinstance(MORTALITY_DATA[0], dict) else "no keys")
+
+print("SUN sample:", SUN_DATA[0] if SUN_DATA else "empty")
+print("SUN keys:", list(SUN_DATA[0].keys()) if SUN_DATA and isinstance(SUN_DATA[0], dict) else "no keys")
 
 
 def make_response(data, status_code=200):
@@ -40,22 +53,28 @@ def make_response(data, status_code=200):
     }
 
 
+def safe_int(value):
+    try:
+        return int(float(value))
+    except Exception:
+        return 0
+
+
 def get_incidence_age():
     result = defaultdict(int)
 
     for row in AGE_DATA:
-        if row.get("Year") != "2023":
-            continue
-        if row.get("Sex") != "Persons":
+        # keep 2023
+        if str(row.get("Year", "")).strip() != "2023":
             continue
 
-        age = row.get("Age group", "Unknown")
-        count = row.get("Count", 0)
+        age = str(row.get("Age group (years)", "Unknown")).strip()
+        count = safe_int(row.get("Count", 0))
 
-        try:
-            result[age] += int(count)
-        except:
-            continue
+        if not age:
+            age = "Unknown"
+
+        result[age] += count
 
     return {
         "labels": list(result.keys()),
@@ -65,26 +84,45 @@ def get_incidence_age():
 
 
 def get_incidence_state():
+    latest_year = -1
+    filtered_rows = []
+
+    # find the latest year
+    for row in STATE_DATA:
+        try:
+            y = int(str(row.get("Year", "")).strip())
+            if y > latest_year:
+                latest_year = y
+        except Exception:
+            continue
+
+    # Get the latest data for the corresponding year
+    for row in STATE_DATA:
+        try:
+            y = int(str(row.get("Year", "")).strip())
+        except Exception:
+            continue
+
+        if y != latest_year:
+            continue
+
+        filtered_rows.append(row)
+
     result = defaultdict(int)
 
-    for row in STATE_DATA:
-        if row.get("Year") != "2023":
-            continue
-        if row.get("Sex") != "Persons":
-            continue
+    for row in filtered_rows:
+        state = str(row.get("State or Territory", "Unknown")).strip()
+        count = safe_int(row.get("Count", 0))
 
-        state = row.get("State or territory", "Unknown")
-        count = row.get("Count", 0)
+        if not state:
+            state = "Unknown"
 
-        try:
-            result[state] += int(count)
-        except:
-            continue
+        result[state] += count
 
     return {
         "labels": list(result.keys()),
         "values": list(result.values()),
-        "datasetLabel": "Cancer incidence by state and territory"
+        "datasetLabel": f"Cancer incidence by state and territory ({latest_year})"
     }
 
 
@@ -92,23 +130,21 @@ def get_mortality():
     result = defaultdict(int)
 
     for row in MORTALITY_DATA:
-        if row.get("Year") != "2023":
-            continue
-        if row.get("Sex") != "Persons":
+        if str(row.get("Year", "")).strip() != "2023":
             continue
 
-        cancer = row.get("Cancer type", "Unknown")
-        count = row.get("Count", 0)
+        age_group = str(row.get("Age group (years)", "Unknown")).strip()
+        count = safe_int(row.get("Count", 0))
 
-        try:
-            result[cancer] += int(count)
-        except:
-            continue
+        if not age_group:
+            age_group = "Unknown"
+
+        result[age_group] += count
 
     return {
         "labels": list(result.keys()),
         "values": list(result.values()),
-        "datasetLabel": "Cancer mortality"
+        "datasetLabel": "Cancer mortality by age group"
     }
 
 
@@ -116,12 +152,18 @@ def get_sun_data():
     tips = []
     takeaway = "Stay sun safe with sunscreen, shade, hats, and protective clothing."
 
+    # table, section, group_label, characteristic, gender, metric, value
     if isinstance(SUN_DATA, list):
-        for row in SUN_DATA[:5]:
-            if isinstance(row, dict):
-                text = row.get("Tip") or row.get("tip") or row.get("Message") or row.get("message")
-                if text:
-                    tips.append(text)
+        for row in SUN_DATA[:8]:
+            if not isinstance(row, dict):
+                continue
+
+            characteristic = str(row.get("characteristic", "")).strip()
+            metric = str(row.get("metric", "")).strip()
+            value = row.get("value", "")
+
+            if characteristic and metric:
+                tips.append(f"{characteristic}: {metric} ({value})")
 
     if not tips:
         tips = [
@@ -132,7 +174,7 @@ def get_sun_data():
         ]
 
     return {
-        "tips": tips,
+        "tips": tips[:4],
         "takeaway": takeaway
     }
 
@@ -143,7 +185,7 @@ def lambda_handler(event, context):
     request_context = event.get("requestContext", {})
     http_method = request_context.get("http", {}).get("method", "")
 
-    # CORS preflight
+    # CORS
     if http_method == "OPTIONS":
         return make_response({"message": "CORS OK"})
 
