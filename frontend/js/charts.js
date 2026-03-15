@@ -17,11 +17,19 @@ async function fetchJson(type) {
   return await res.json();
 }
 
-function showErrorText(id, message) {
+function hideElement(id) {
   const el = document.getElementById(id);
-  if (el) {
-    el.innerText = message;
-  }
+  if (el) el.style.display = "none";
+}
+
+function showElement(id, display = "block") {
+  const el = document.getElementById(id);
+  if (el) el.style.display = display;
+}
+
+function showError(id) {
+  const el = document.getElementById(id);
+  if (el) el.classList.remove("hidden");
 }
 
 function sanitizeChartData(data) {
@@ -52,64 +60,119 @@ function sanitizeChartData(data) {
   };
 }
 
+function createBarChart(canvasId, data) {
+  new Chart(document.getElementById(canvasId), {
+    type: "bar",
+    data: {
+      labels: data.labels,
+      datasets: [
+        {
+          label: data.datasetLabel,
+          data: data.values,
+          backgroundColor: "rgba(54, 162, 235, 0.7)",
+          borderColor: "rgba(54, 162, 235, 1)",
+          borderWidth: 1
+        }
+      ]
+    },
+    options: {
+      responsive: true,
+      maintainAspectRatio: false,
+      plugins: {
+        legend: {
+          labels: {
+            color: "#cbd5e1"
+          }
+        }
+      },
+      scales: {
+        x: {
+          ticks: {
+            color: "#94a3b8",
+            maxRotation: 45,
+            minRotation: 45
+          },
+          grid: {
+            color: "rgba(255,255,255,0.05)"
+          }
+        },
+        y: {
+          beginAtZero: true,
+          ticks: {
+            color: "#94a3b8"
+          },
+          grid: {
+            color: "rgba(255,255,255,0.05)"
+          }
+        }
+      }
+    }
+  });
+}
+
+function createLineChart(canvasId, data) {
+  new Chart(document.getElementById(canvasId), {
+    type: "line",
+    data: {
+      labels: data.labels,
+      datasets: [
+        {
+          label: data.datasetLabel,
+          data: data.values,
+          borderColor: "rgba(255, 159, 64, 1)",
+          backgroundColor: "rgba(255, 159, 64, 0.2)",
+          borderWidth: 2,
+          tension: 0.3,
+          fill: true
+        }
+      ]
+    },
+    options: {
+      responsive: true,
+      maintainAspectRatio: false,
+      plugins: {
+        legend: {
+          labels: {
+            color: "#cbd5e1"
+          }
+        }
+      },
+      scales: {
+        x: {
+          ticks: {
+            color: "#94a3b8",
+            maxRotation: 45,
+            minRotation: 45
+          },
+          grid: {
+            color: "rgba(255,255,255,0.05)"
+          }
+        },
+        y: {
+          beginAtZero: true,
+          ticks: {
+            color: "#94a3b8"
+          },
+          grid: {
+            color: "rgba(255,255,255,0.05)"
+          }
+        }
+      }
+    }
+  });
+}
+
 async function loadAgeChart() {
   try {
     const rawData = await fetchJson("age");
     const data = sanitizeChartData(rawData);
 
-    const loadingText = document.getElementById("ageLoading");
-    if (loadingText) loadingText.style.display = "none";
-
-    new Chart(document.getElementById("ageChart"), {
-      type: "bar",
-      data: {
-        labels: data.labels,
-        datasets: [
-          {
-            label: data.datasetLabel,
-            data: data.values,
-            backgroundColor: "rgba(54, 162, 235, 0.7)",
-            borderColor: "rgba(54, 162, 235, 1)",
-            borderWidth: 1
-          }
-        ]
-      },
-      options: {
-        responsive: true,
-        maintainAspectRatio: false,
-        plugins: {
-          legend: {
-            labels: {
-              color: "#cbd5e1"
-            }
-          }
-        },
-        scales: {
-          x: {
-            ticks: {
-              color: "#94a3b8",
-              maxRotation: 45,
-              minRotation: 45
-            },
-            grid: {
-              color: "rgba(255,255,255,0.05)"
-            }
-          },
-          y: {
-            beginAtZero: true,
-            ticks: {
-              color: "#94a3b8"
-            },
-            grid: {
-              color: "rgba(255,255,255,0.05)"
-            }
-          }
-        }
-      }
-    });
+    hideElement("ageLoading");
+    createBarChart("ageChart", data);
   } catch (err) {
     console.error("Age chart error:", err);
-    showErrorText("ageLoading", "Failed to load age-group data.");
+    hideElement("ageLoading");
+    showError("ageError");
   }
 }
 
@@ -118,59 +181,12 @@ async function loadStateChart() {
     const rawData = await fetchJson("state");
     const data = sanitizeChartData(rawData);
 
-    const loadingText = document.getElementById("stateLoading");
-    if (loadingText) loadingText.style.display = "none";
-
-    new Chart(document.getElementById("stateChart"), {
-      type: "bar",
-      data: {
-        labels: data.labels,
-        datasets: [
-          {
-            label: data.datasetLabel,
-            data: data.values,
-            backgroundColor: "rgba(75, 192, 192, 0.7)",
-            borderColor: "rgba(75, 192, 192, 1)",
-            borderWidth: 1
-          }
-        ]
-      },
-      options: {
-        responsive: true,
-        maintainAspectRatio: false,
-        plugins: {
-          legend: {
-            labels: {
-              color: "#cbd5e1"
-            }
-          }
-        },
-        scales: {
-          x: {
-            ticks: {
-              color: "#94a3b8",
-              maxRotation: 45,
-              minRotation: 45
-            },
-            grid: {
-              color: "rgba(255,255,255,0.05)"
-            }
-          },
-          y: {
-            beginAtZero: true,
-            ticks: {
-              color: "#94a3b8"
-            },
-            grid: {
-              color: "rgba(255,255,255,0.05)"
-            }
-          }
-        }
-      }
-    });
+    hideElement("stateLoading");
+    createBarChart("stateChart", data);
   } catch (err) {
     console.error("State chart error:", err);
-    showErrorText("stateLoading", "Failed to load state data.");
+    hideElement("stateLoading");
+    showError("stateError");
   }
 }
 
@@ -179,61 +195,12 @@ async function loadMortalityChart() {
     const rawData = await fetchJson("mortality");
     const data = sanitizeChartData(rawData);
 
-    const loadingText = document.getElementById("mortalityLoading");
-    if (loadingText) loadingText.style.display = "none";
-
-    new Chart(document.getElementById("mortalityChart"), {
-      type: "line",
-      data: {
-        labels: data.labels,
-        datasets: [
-          {
-            label: data.datasetLabel,
-            data: data.values,
-            borderColor: "rgba(255, 159, 64, 1)",
-            backgroundColor: "rgba(255, 159, 64, 0.2)",
-            borderWidth: 2,
-            tension: 0.3,
-            fill: true
-          }
-        ]
-      },
-      options: {
-        responsive: true,
-        maintainAspectRatio: false,
-        plugins: {
-          legend: {
-            labels: {
-              color: "#cbd5e1"
-            }
-          }
-        },
-        scales: {
-          x: {
-            ticks: {
-              color: "#94a3b8",
-              maxRotation: 45,
-              minRotation: 45
-            },
-            grid: {
-              color: "rgba(255,255,255,0.05)"
-            }
-          },
-          y: {
-            beginAtZero: true,
-            ticks: {
-              color: "#94a3b8"
-            },
-            grid: {
-              color: "rgba(255,255,255,0.05)"
-            }
-          }
-        }
-      }
-    });
+    hideElement("mortalityLoading");
+    createLineChart("mortalityChart", data);
   } catch (err) {
     console.error("Mortality chart error:", err);
-    showErrorText("mortalityLoading", "Failed to load mortality data.");
+    hideElement("mortalityLoading");
+    showError("mortalityError");
   }
 }
 
@@ -264,9 +231,10 @@ async function loadTips() {
     }
   } catch (err) {
     console.error("Tips error:", err);
+
     const container = document.getElementById("tipList");
     if (container) {
-      container.innerHTML = "<p>Failed to load tips.</p>";
+      container.innerHTML = `<div class="error-text">Failed to load tips.</div>`;
     }
 
     const takeaway = document.getElementById("keyTakeaway");
