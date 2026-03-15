@@ -1,7 +1,7 @@
 from dotenv import load_dotenv
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
-from routers import uv, postcode
+from routers import uv, postcode, awareness
 
 load_dotenv()
 
@@ -17,6 +17,7 @@ app.add_middleware(
 
 app.include_router(uv.router)
 app.include_router(postcode.router)
+app.include_router(awareness.router)
 
 @app.get("/")
 def root():
