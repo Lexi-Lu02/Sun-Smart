@@ -1,17 +1,14 @@
-const API = "http://16.176.142.118:8000/api/awareness"
+const API = "https://m4d1jzxb7.execute-api.ap-southeast-2.amazonaws.com/default/sunsmart-data-api"
 
 document.addEventListener("DOMContentLoaded", () => {
-
   loadAgeChart()
   loadStateChart()
   loadMortalityChart()
   loadTips()
-
 })
 
-async function loadAgeChart(){
-
-  const res = await fetch(`${API}/incidence-age`)
+async function loadAgeChart() {
+  const res = await fetch(`${API}?type=age`)
   const data = await res.json()
 
   new Chart(document.getElementById("ageChart"), {
@@ -26,9 +23,8 @@ async function loadAgeChart(){
   })
 }
 
-async function loadStateChart(){
-
-  const res = await fetch(`${API}/incidence-state`)
+async function loadStateChart() {
+  const res = await fetch(`${API}?type=state`)
   const data = await res.json()
 
   new Chart(document.getElementById("stateChart"), {
@@ -43,9 +39,8 @@ async function loadStateChart(){
   })
 }
 
-async function loadMortalityChart(){
-
-  const res = await fetch(`${API}/mortality`)
+async function loadMortalityChart() {
+  const res = await fetch(`${API}?type=mortality`)
   const data = await res.json()
 
   new Chart(document.getElementById("mortalityChart"), {
@@ -60,26 +55,21 @@ async function loadMortalityChart(){
   })
 }
 
-async function loadTips(){
-
-  const res = await fetch(`${API}/sunprotection`)
+async function loadTips() {
+  const res = await fetch(`${API}?type=sun`)
   const data = await res.json()
 
   const container = document.getElementById("tipList")
   container.innerHTML = ""
 
   data.tips.forEach(tip => {
-
     const div = document.createElement("div")
     div.className = "fact-item"
-
     div.innerHTML = `
       <div class="fact-badge">Tip</div>
       <p>${tip}</p>
     `
-
     container.appendChild(div)
-
   })
 
   document.getElementById("keyTakeaway").innerText = data.takeaway
