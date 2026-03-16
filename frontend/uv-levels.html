@@ -6,9 +6,8 @@
 <title>SunSmart — UV Levels</title>
 <link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;600;700;800&family=DM+Sans:ital,wght@0,300;0,400;0,500;1,400&display=swap" rel="stylesheet">
 <link rel="stylesheet" href="css/style.css">
-<!-- Postcode API (S3 + API Gateway): set base URL below, e.g. your API Gateway invoke URL with no trailing slash -->
 <script>
-  window.SUNSMART_API_BASE = window.SUNSMART_API_BASE || ''; // e.g. 'https://abc123.execute-api.ap-southeast-2.amazonaws.com'
+  window.SUNSMART_API_BASE = 'https://aaj9607dn4.execute-api.ap-southeast-2.amazonaws.com';
 </script>
 </head>
 <body>
@@ -18,7 +17,7 @@
   <div class="nav-links">
     <a href="uv-levels.html" class="nav-link active">☀️ UV Levels</a>
     <a href="awareness.html" class="nav-link">📊 Awareness</a>
-    <a href="protection.html" class="nav-link">🧴 Protect</a>
+    <a href="protection.html" class="nav-link">🧴 Protections</a>
   </div>
   <div class="nav-user">A</div>
 </nav>
@@ -89,487 +88,495 @@
           <strong id="burnMsgStrong">—</strong>
         </p>
       </div>
-      <div>
-        <div class="burn-label">Time to damage</div>
-        <div class="burn-row">
-          <div class="burn-bar-bg"><div class="burn-bar-fill" id="burnBarFill"></div></div>
-          <span class="burn-time" id="burnTime">— min left</span>
-        </div>
+      <div class="risk-card-icons" aria-label="Sun protection reminders">
+        <img src="images/sun-stroke.png" alt="Sun exposure risk" class="risk-icon" title="Sun exposure risk">
+        <img src="images/clothing.png" alt="Protective clothing" class="risk-icon" title="Protective clothing">
+        <img src="images/ultraviolet.png" alt="UV protection" class="risk-icon" title="UV protection">
+        <img src="images/headwear.png" alt="Headwear protection" class="risk-icon" title="Headwear protection">
       </div>
     </div>
-  </div>
-
-  <div class="card calc-card" id="calcCard">
-    <div class="card-title">Sunburn timer calculator</div>
-    <p class="calc-desc">Estimate how long you can stay in the sun before burning. </p>
-    <div class="calc-form">
-      <div class="calc-field">
-        <label for="calcUv">UV index</label>
-        <input type="number" id="calcUv" min="0" max="15" step="0.1" value="1" placeholder="e.g. 8">
-      </div>
-      <div class="calc-field">
-        <label for="calcSkin">Skin type (Fitzpatrick)</label>
-        <select id="calcSkin">
-          <option value="1">Type I — Very fair, always burns</option>
-          <option value="2" selected>Type II — Fair, burns easily</option>
-          <option value="3">Type III — Medium, sometimes burns</option>
-          <option value="4">Type IV — Olive, rarely burns</option>
-          <option value="5">Type V — Brown, very rarely burns</option>
-          <option value="6">Type VI — Dark, never burns</option>
-        </select>
-      </div>
-      <div class="calc-field">
-        <label for="calcSpf">Sunscreen SPF (cap 50)</label>
-        <input type="number" id="calcSpf" min="1" max="50" value="30" placeholder="30">
-      </div>
-      <div class="calc-field">
-        <label for="calcCloud">Cloud cover</label>
-        <select id="calcCloud">
-          <option value="1">Clear sky (100% UV)</option>
-          <option value="0.9">Light clouds (90% UV)</option>
-          <option value="0.8">Moderate clouds (80% UV)</option>
-          <option value="0.7">Heavy clouds (70% UV)</option>
-        </select>
-      </div>
-      <button type="button" id="calcBtn" class="calc-btn">Calculate</button>
-    </div>
-    <div class="calc-result" id="calcResult" aria-live="polite">
-      <span class="calc-result-label">Time before burning (approx.):</span>
-      <span class="calc-result-value" id="calcResultValue" aria-live="polite">—</span>
-    </div>
-    <p class="calc-method">How we calculate: MED by skin type (I=200, II=250, III=300, IV=450, V=600, VI=1000 J/m²). UV irradiance = UVI × 0.025 W/m² × cloud. Time to MED (min) = MED ÷ (irradiance × 60). SPF multiplier = 1 + 0.8×(SPF−1), cap 50.</p>
   </div>
 
   <div class="card" id="forecastCard" style="margin-bottom:20px;display:none;">
     <div class="card-title">Next 24h UV Forecast</div>
     <div class="forecast-row" id="forecastRow">
-      <!-- Filled by API -->
     </div>
   </div>
 
-  <div class="card" id="tipsCard" style="display:none;">
-    <div class="card-title" id="tipsTitle">Protection Tips for UV —</div>
-    <p class="tips-intro">When the UV index is 3 or higher, protect your skin. UV is strongest between 10am and 4pm. Protection is important all year, including on cloudy and cool days—UV reflects off water, sand, cement, and snow.</p>
-    <div class="tips-grid">
-      <div class="tip-item">
-        <span class="tip-icon">🕶️</span>
-        <div><div class="tip-title">Wear sunglasses</div><div class="tip-body">Sunglasses protect your eyes from UV rays and reduce the risk of cataracts, and protect the skin around your eyes. Choose ones that block both UVA and UVB; wrap-around styles work best by blocking UV from the sides.</div></div>
+  <div class="card weather-card" id="conditionsCard" style="display:none;">
+    <div class="card-title" style="color:var(--orange);" id="conditionsTitle">Today's Conditions</div>
+    <div class="weather-grid">
+      <div class="weather-item">
+        <span class="w-label">Temperature</span>
+        <span class="w-val" id="condTemp">—</span>
+        <span class="w-desc" id="condFeels">—</span>
       </div>
-      <div class="tip-item">
-        <span class="tip-icon">🧴</span>
-        <div><div class="tip-title">Use broad-spectrum sunscreen</div><div class="tip-body">Use SPF 15 or higher that filters both UVA and UVB. Apply a thick layer to all exposed skin before going outside. Reapply after 2 hours and after swimming, sweating, or toweling off. Check the expiration date.</div></div>
+      <div class="weather-item">
+        <span class="w-label">UV Index</span>
+        <span class="w-val" id="condUv">—</span>
+        <span class="w-desc" id="condUvLevel">—</span>
       </div>
-      <div class="tip-item">
-        <span class="tip-icon">🎩</span>
-        <div><div class="tip-title">Wear a broad-brimmed hat</div><div class="tip-body">Choose a hat with a brim all the way around that shades your face, ears, and the back of your neck. Tightly woven fabric (e.g. canvas) works best. Avoid straw hats with holes that let sunlight through. If you wear a baseball cap, also protect your ears and neck with clothing or sunscreen.</div></div>
+      <div class="weather-item">
+        <span class="w-label">Cloud Cover</span>
+        <span class="w-val" id="condCloud">—</span>
+        <span class="w-desc" id="condCloudDesc">—</span>
       </div>
-      <div class="tip-item">
-        <span class="tip-icon">👕</span>
-        <div><div class="tip-title">Wear protective clothing</div><div class="tip-body">When possible, wear long sleeves and long pants or skirts. Tightly woven fabric offers the best protection. A wet T-shirt gives much less UV protection than a dry one; darker colors may offer more protection than light ones.</div></div>
-      </div>
-      <div class="tip-item">
-        <span class="tip-icon">🌲</span>
-        <div><div class="tip-title">Seek shade</div><div class="tip-body">Stay under an umbrella, tree, or other shelter to reduce sun damage risk. Use sunscreen or protective clothing even when you’re in the shade—your best protection combines shade with other measures.</div></div>
-      </div>
-      <div class="tip-item">
-        <span class="tip-icon">⏰</span>
-        <div><div class="tip-title">Limit exposure during peak UV</div><div class="tip-body">UV rays are strongest from 10am to 4pm (9am to 3pm standard time). Plan outdoor activities for early morning or late afternoon when possible, and take breaks in the shade to reapply sunscreen and rehydrate.</div></div>
+      <div class="weather-item">
+        <span class="w-label">Peak UV Time</span>
+        <span class="w-val" id="condPeakTime">—</span>
+        <span class="w-desc">Avoid direct exposure</span>
       </div>
     </div>
   </div>
+
 </main>
 
 <script>
-(function() {
-  // OpenWeather One Call 3.0 — requires "One Call by Call" subscription. Endpoint must be 3.0 (not 2.5).
-  var OWM_API_KEY = 'c17ba00fc539357c50415c554bc3fa01';
-  var OWM_ONE_CALL_URL = 'https://api.openweathermap.org/data/3.0/onecall';
-
-  // Default: Sydney (used when user does not share location)
-  var DEFAULT_LAT = -33.8688;
-  var DEFAULT_LNG = 151.2093;
-  var DEFAULT_LABEL = 'Sydney, NSW';
-
-  var uvLevels = [
-    { max: 2,  label: 'Low',       color: '#4ade80' },
-    { max: 5,  label: 'Moderate',  color: '#facc15' },
-    { max: 7,  label: 'High',      color: '#fb923c' },
-    { max: 10, label: 'Very High', color: '#f87171' },
-    { max: 99, label: 'Extreme',   color: '#c084fc' }
-  ];
-
-  function getUvLevel(uv) {
-    var n = Math.round(uv);
-    return uvLevels.find(function(l) { return n <= l.max; }) || uvLevels[uvLevels.length - 1];
-  }
-
-  function formatTime(isoStr) {
-    var d = new Date(isoStr);
-    var h = d.getHours();
-    var ampm = h >= 12 ? 'PM' : 'AM';
-    h = h % 12 || 12;
-    return h + ' ' + ampm;
-  }
-
-  // Short labels for forecast cards (match desktop: LOW, MOD, HIGH, V.HIGH)
-  var forecastShortLabels = { 'Low': 'Low', 'Moderate': 'Mod', 'High': 'High', 'Very High': 'V.High', 'Extreme': 'Ext' };
-  function getForecastLabel(level) {
-    return forecastShortLabels[level.label] || level.label;
-  }
-
-  // Get UV value for a 2-hour slot: use forecast entry whose time is closest to slot midpoint
-  function getUvForSlot(forecast, slotStartMs, slotEndMs) {
-    var midMs = slotStartMs + 3600000;
-    var best = null, bestDiff = Infinity;
-    var maxAcceptDiff = 14 * 3600000; // accept up to 14h so we always show something when we have data
-    for (var i = 0; i < forecast.length; i++) {
-      var raw = forecast[i];
-      var ts = raw.uv_time || raw.uv_time_iso || raw.uv_max_time || raw.datetime;
-      if (ts == null) continue;
-      var t = new Date(ts).getTime();
-      if (isNaN(t)) continue;
-      var diff = Math.abs(t - midMs);
-      if (diff < bestDiff && diff <= maxAcceptDiff) { bestDiff = diff; best = raw; }
+  (function() {
+    var DEFAULT_POSTCODE = '2000';
+    var DEFAULT_LABEL = 'Sydney, NSW';
+  
+    var uvLevels = [
+      { max: 2,  label: 'Low',       color: '#4ade80' },
+      { max: 5,  label: 'Moderate',  color: '#facc15' },
+      { max: 7,  label: 'High',      color: '#fb923c' },
+      { max: 10, label: 'Very High', color: '#f87171' },
+      { max: 99, label: 'Extreme',   color: '#c084fc' }
+    ];
+  
+    function getUvLevel(uv) {
+      var n = Math.round(uv);
+      return uvLevels.find(function(l) { return n <= l.max; }) || uvLevels[uvLevels.length - 1];
     }
-    return best;
-  }
-
-  function formatTimeRange(startMs, endMs) {
-    var s = new Date(startMs), e = new Date(endMs);
-    var h1 = s.getHours(), h2 = e.getHours();
-    var ampm1 = h1 >= 12 ? 'PM' : 'AM', ampm2 = h2 >= 12 ? 'PM' : 'AM';
-    h1 = h1 % 12 || 12; h2 = h2 % 12 || 12;
-    return h1 + ' ' + ampm1 + ' – ' + h2 + ' ' + ampm2;
-  }
-
-  // Approximate burn-time message from UV (OpenWeatherMap does not provide safe_exposure_time)
-  function getBurnMessage(uv) {
-    var n = Math.round(uv);
-    if (n <= 2) return { msg: 'low risk — still use sunscreen', time: '—', fill: 90 };
-    if (n <= 5) return { msg: 'moderate — reapply every 2h', time: '—', fill: 65 };
-    if (n <= 7) return { msg: 'burning in ~30 minutes', time: '~30 min left', fill: 40 };
-    return { msg: 'very high UV — protect skin', time: 'Seek shade', fill: 15 };
-  }
-
-  // Warning card content and theme by UV category (matches scale bar colors)
-  function getWarningContent(level) {
-    var label = level.label;
-    if (label === 'Low') return { title: 'Low UV — Minimal Risk', message: 'Protection still recommended for extended time outdoors. Use sunscreen and cover up if outside for long.' };
-    if (label === 'Moderate') return { title: 'Moderate UV — Take Care', message: 'Wear broad-spectrum sunscreen and a hat. Reapply every 2 hours and seek shade at midday.' };
-    if (label === 'High') return { title: 'High UV — Protect Your Skin', message: 'Seek shade when possible. Use SPF 30+ and reapply regularly. Cover up with clothing and a hat.' };
-    if (label === 'Very High') return { title: 'Very High UV — Extra Protection', message: 'Minimize time in the sun. Use SPF 50+, a broad-brimmed hat, and stay in shade when you can.' };
-    return { title: 'Extreme UV — Seek Shade', message: 'Very high risk of harm. Stay indoors or in deep shade. If you must go out, protect all exposed skin and reapply sunscreen often.' };
-  }
-
-  function hexToRgba(hex, a) {
-    var r = parseInt(hex.slice(1, 3), 16), g = parseInt(hex.slice(3, 5), 16), b = parseInt(hex.slice(5, 7), 16);
-    return 'rgba(' + r + ',' + g + ',' + b + ',' + a + ')';
-  }
-
-  function updateUI(data) {
-    var current = data.current || {};
-    var uv = typeof current.uvi === 'number' ? current.uvi : 0;
-    var level = getUvLevel(uv);
-
-    document.getElementById('gaugeNum').textContent = Math.round(uv * 10) / 10;
-    document.getElementById('gaugeLevel').textContent = level.label;
-    document.getElementById('gaugeLevel').style.color = level.color;
-
-    var uvCap = Math.max(0, Math.min(12, uv));
-    var angleRad = Math.PI * (1 - uvCap / 12);
-    var cx = 110, cy = 110, r = 88;
-    var tipX = cx + r * Math.cos(angleRad);
-    var tipY = cy - r * Math.sin(angleRad);
-    var gaugeLine = document.getElementById('gaugePointerLine');
-    var gaugeTip = document.getElementById('gaugePointerTip');
-    if (gaugeLine) {
-      gaugeLine.setAttribute('x2', tipX);
-      gaugeLine.setAttribute('y2', tipY);
-      gaugeLine.setAttribute('stroke', level.color);
+  
+    function formatTime(isoStr) {
+      var d = new Date(isoStr);
+      var h = d.getHours();
+      var ampm = h >= 12 ? 'PM' : 'AM';
+      h = h % 12 || 12;
+      return h + ' ' + ampm;
     }
-    if (gaugeTip) {
-      gaugeTip.setAttribute('cx', tipX);
-      gaugeTip.setAttribute('cy', tipY);
-      gaugeTip.setAttribute('fill', level.color);
+  
+    var forecastShortLabels = { 'Low': 'Low', 'Moderate': 'Mod', 'High': 'High', 'Very High': 'V.High', 'Extreme': 'Ext' };
+    function getForecastLabel(level) {
+      return forecastShortLabels[level.label] || level.label;
     }
-
-    var pointer = document.getElementById('uvPointer');
-    pointer.style.color = level.color;
-    var pct = (uvCap / 12) * 100;
-    var pctClamped = Math.max(4, Math.min(96, pct));
-    pointer.style.left = pctClamped + '%';
-    pointer.style.transform = 'translateX(-50%)';
-
-    var burn = getBurnMessage(uv);
-    document.getElementById('burnTime').textContent = burn.time;
-    document.getElementById('burnBarFill').style.width = burn.fill + '%';
-    document.getElementById('burnBarFill').style.background = level.color;
-
-    var warning = getWarningContent(level);
-    document.getElementById('alertLabel').textContent = warning.title;
-    document.getElementById('alertLabel').style.color = level.color;
-    document.getElementById('burnMsg').textContent = warning.message;
-
-    var card = document.getElementById('alertCard');
-    var iconWrap = document.getElementById('alertIconWrap');
-    if (card) {
-      card.style.background = 'linear-gradient(135deg, ' + hexToRgba(level.color, 0.18) + ', ' + hexToRgba(level.color, 0.06) + ')';
-      card.style.borderColor = hexToRgba(level.color, 0.45);
+  
+    function getUvForSlot(forecast, slotStartMs, slotEndMs) {
+      var midMs = slotStartMs + 3600000;
+      var best = null, bestDiff = Infinity;
+      var maxAcceptDiff = 14 * 3600000;
+      for (var i = 0; i < forecast.length; i++) {
+        var raw = forecast[i];
+        var ts = raw.uv_time || raw.uv_time_iso || raw.uv_max_time || raw.datetime;
+        if (ts == null) continue;
+        var t = new Date(ts).getTime();
+        if (isNaN(t)) continue;
+        var diff = Math.abs(t - midMs);
+        if (diff < bestDiff && diff <= maxAcceptDiff) { bestDiff = diff; best = raw; }
+      }
+      return best;
     }
-    if (iconWrap) iconWrap.style.background = hexToRgba(level.color, 0.25);
-
-    document.getElementById('tipsTitle').textContent = 'Protection Tips for UV ' + Math.round(uv);
-    document.getElementById('tipsCard').style.display = 'block';
-    document.getElementById('forecastCard').style.display = 'block';
-
-    var tipItems = document.querySelectorAll('.tips-grid .tip-item');
-    var n = Math.round(uv);
-    var highlightCount = n <= 2 ? 2 : n <= 5 ? 3 : n <= 7 ? 4 : n <= 10 ? 5 : 6;
-    for (var t = 0; t < tipItems.length; t++) {
-      if (t < highlightCount) tipItems[t].classList.add('highlighted');
-      else tipItems[t].classList.remove('highlighted');
+  
+    function formatTimeRange(startMs, endMs) {
+      var s = new Date(startMs), e = new Date(endMs);
+      var h1 = s.getHours(), h2 = e.getHours();
+      var ampm1 = h1 >= 12 ? 'PM' : 'AM', ampm2 = h2 >= 12 ? 'PM' : 'AM';
+      h1 = h1 % 12 || 12; h2 = h2 % 12 || 12;
+      return h1 + ' ' + ampm1 + ' – ' + h2 + ' ' + ampm2;
     }
-
-    var calcUvInput = document.getElementById('calcUv');
-    if (calcUvInput) calcUvInput.value = uv < 1 ? 1 : (Math.round(uv * 10) / 10);
-    runSunburnCalc();
-
-    // Build forecast from One Call hourly (next 24h; hourly has dt in sec, uvi)
-    var hourly = data.hourly || [];
-    var uvForecast = [];
-    for (var h = 0; h < hourly.length && h < 24; h++) {
-      var item = hourly[h];
-      var uvi = item.uvi;
-      if (typeof uvi !== 'number' || isNaN(uvi)) uvi = 0;
-      uvForecast.push({ uv: uvi, uv_time: new Date((item.dt || 0) * 1000).toISOString() });
+  
+    function getBurnMessage(uv) {
+      var n = Math.round(uv);
+      if (n <= 2) return { msg: 'low risk — still use sunscreen', time: '—', fill: 90 };
+      if (n <= 5) return { msg: 'moderate — reapply every 2h', time: '—', fill: 65 };
+      if (n <= 7) return { msg: 'burning in ~30 minutes', time: '~30 min left', fill: 40 };
+      return { msg: 'very high UV — protect skin', time: 'Seek shade', fill: 15 };
     }
-    updateForecastUI(uv, uvForecast);
-  }
+  
+    function getWarningContent(level) {
+      var label = level.label;
+      if (label === 'Low') return { title: 'Low UV — Minimal Risk', message: 'Protection still recommended for extended time outdoors. Use sunscreen and cover up if outside for long.' };
+      if (label === 'Moderate') return { title: 'Moderate UV — Take Care', message: 'Wear broad-spectrum sunscreen and a hat. Reapply every 2 hours and seek shade at midday.' };
+      if (label === 'High') return { title: 'High UV — Protect Your Skin', message: 'Seek shade when possible. Use SPF 30+ and reapply regularly. Cover up with clothing and a hat.' };
+      if (label === 'Very High') return { title: 'Very High UV — Extra Protection', message: 'Minimize time in the sun. Use SPF 50+, a broad-brimmed hat, and stay in shade when you can.' };
+      return { title: 'Extreme UV — Seek Shade', message: 'Very high risk of harm. Stay indoors or in deep shade. If you must go out, protect all exposed skin and reapply sunscreen often.' };
+    }
+  
+    function hexToRgba(hex, a) {
+      var r = parseInt(hex.slice(1, 3), 16), g = parseInt(hex.slice(3, 5), 16), b = parseInt(hex.slice(5, 7), 16);
+      return 'rgba(' + r + ',' + g + ',' + b + ',' + a + ')';
+    }
+  
+    function updateUI(data) {
+      var uv = typeof data.uv_index === 'number' ? data.uv_index : 0;
+      var level = data.level && data.level_color ? { label: data.level, color: data.level_color } : getUvLevel(uv);
 
-  // Next 24h forecast: 12 cubes, each 2 hours; first cube = Now (current UV), rest from forecast API
-  function updateForecastUI(currentUv, forecastArray) {
-    var now = new Date(), nowMs = now.getTime();
-    var row = document.getElementById('forecastRow');
-    if (!row) return;
-    var cur = (typeof currentUv === 'number' && !isNaN(currentUv)) ? currentUv : 0;
-    if (typeof console !== 'undefined' && console.log) console.log('[UV Forecast] currentUV=' + cur + ', forecast entries=' + (forecastArray ? forecastArray.length : 0));
-    row.innerHTML = '';
-    for (var i = 0; i < 12; i++) {
-      var slotStartMs = nowMs + i * 2 * 3600000;
-      var slotEndMs = nowMs + (i + 1) * 2 * 3600000;
-      var isFirst = (i === 0);
-      var timeLabel = isFirst ? 'Now ◀' : formatTimeRange(slotStartMs, slotEndMs);
-      var uvVal, color, label;
-      if (isFirst) {
-        uvVal = Math.round(cur * 10) / 10;
-        var fl = getUvLevel(cur);
-        color = fl.color;
-        label = getForecastLabel(fl);
-      } else {
-        var f = getUvForSlot(forecastArray, slotStartMs, slotEndMs);
-        if (f && typeof f.uv === 'number' && !isNaN(f.uv)) {
-          uvVal = Math.round(f.uv * 10) / 10;
-          var fl2 = getUvLevel(f.uv);
-          color = fl2.color;
-          label = getForecastLabel(fl2);
-        } else {
-          uvVal = '—';
-          color = 'var(--muted)';
-          label = '—';
+      document.getElementById('gaugeNum').textContent = Math.round(uv * 10) / 10;
+      document.getElementById('gaugeLevel').textContent = level.label;
+      document.getElementById('gaugeLevel').style.color = level.color;
+
+      var uvCap = Math.max(0, Math.min(12, uv));
+      var angleRad = Math.PI * (1 - uvCap / 12);
+      var cx = 110, cy = 110, r = 88;
+      var tipX = cx + r * Math.cos(angleRad);
+      var tipY = cy - r * Math.sin(angleRad);
+      var gaugeLine = document.getElementById('gaugePointerLine');
+      var gaugeTip = document.getElementById('gaugePointerTip');
+      if (gaugeLine) {
+        gaugeLine.setAttribute('x2', tipX);
+        gaugeLine.setAttribute('y2', tipY);
+        gaugeLine.setAttribute('stroke', level.color);
+      }
+      if (gaugeTip) {
+        gaugeTip.setAttribute('cx', tipX);
+        gaugeTip.setAttribute('cy', tipY);
+        gaugeTip.setAttribute('fill', level.color);
+      }
+
+      var pointer = document.getElementById('uvPointer');
+      pointer.style.color = level.color;
+      var pct = (uvCap / 12) * 100;
+      var pctClamped = Math.max(4, Math.min(96, pct));
+      pointer.style.left = pctClamped + '%';
+      pointer.style.transform = 'translateX(-50%)';
+
+      var warning = getWarningContent(level);
+      document.getElementById('alertLabel').textContent = warning.title;
+      document.getElementById('alertLabel').style.color = level.color;
+      document.getElementById('burnMsg').textContent = data.alert_message || warning.message;
+
+      var card = document.getElementById('alertCard');
+      var iconWrap = document.getElementById('alertIconWrap');
+      if (card) {
+        card.style.background = 'linear-gradient(135deg, ' + hexToRgba(level.color, 0.18) + ', ' + hexToRgba(level.color, 0.06) + ')';
+        card.style.borderColor = hexToRgba(level.color, 0.45);
+      }
+      if (iconWrap) iconWrap.style.background = hexToRgba(level.color, 0.25);
+
+      document.getElementById('forecastCard').style.display = 'block';
+      document.getElementById('conditionsCard').style.display = 'block';
+
+      runSunburnCalc(uv);
+
+      var hf = data.hourly_forecast || [];
+      var uvForecast = [];
+
+      for (var i = 0; i < hf.length; i++) {
+        var item = hf[i];
+        if (item.dt != null) {
+          uvForecast.push({
+            uv: typeof item.uv_index === 'number' ? item.uv_index : 0,
+            uv_time: new Date(item.dt * 1000).toISOString()
+          });
         }
       }
-      var activeClass = isFirst ? ' forecast-item active' : ' forecast-item';
-      var item = '<div class="' + activeClass + '">' +
-        '<div class="f-time">' + timeLabel + '</div>' +
-        '<div class="f-num" style="color:' + color + '">' + uvVal + '</div>' +
-        '<div class="f-label" style="color:' + color + '">' + label + '</div></div>';
-      row.innerHTML += item;
+      if (uvForecast.length === 0) {
+        uvForecast.push({ uv: uv, uv_time: new Date().toISOString() });
+      }
+      updateForecastUI(uv, uvForecast);
+
+      var locLabel = document.getElementById('locationLabel').textContent || '';
+      document.getElementById('conditionsTitle').textContent = "Today's Conditions" + (locLabel ? ' — ' + locLabel : '');
+      document.getElementById('condTemp').textContent = data.current_temp != null ? Math.round(data.current_temp) + '°C' : '—';
+      document.getElementById('condFeels').textContent = data.feels_like != null ? 'Feels like ' + Math.round(data.feels_like) + '°C' : '—';
+      document.getElementById('condUv').textContent = data.uv_index != null ? Math.round(data.uv_index * 10) / 10 : '—';
+      document.getElementById('condUv').style.color = level.color;
+      document.getElementById('condUvLevel').textContent = level.label;
+      document.getElementById('condCloud').textContent = data.cloud_cover != null ? data.cloud_cover + '%' : '—';
+      document.getElementById('condCloudDesc').textContent = data.cloud_cover != null ? (data.cloud_cover < 30 ? 'Mostly clear — UV unfiltered' : data.cloud_cover < 70 ? 'Partly cloudy' : 'Cloudy — some UV blocked') : '—';
+      document.getElementById('condPeakTime').textContent = data.peak_uv_time || '—';
     }
-  }
-
-  // Sunburn timer — SparkCalc method: MED (J/m²) by skin type, irradiance = UVI × 0.025 W/m², Time to MED = MED/(irradiance×60) min, SPF mult = 1+0.8×(SPF−1) cap 50
-  var MED_BY_TYPE = [0, 200, 250, 300, 450, 600, 1000];
-  function runSunburnCalc() {
-    var uvEl = document.getElementById('calcUv');
-    var skinEl = document.getElementById('calcSkin');
-    var spfEl = document.getElementById('calcSpf');
-    var cloudEl = document.getElementById('calcCloud');
-    var outEl = document.getElementById('calcResultValue') || document.querySelector('.calc-result-value');
-    var resultBlock = document.getElementById('calcResult');
-    if (!outEl) return;
-
-    var uvi = parseFloat(String(uvEl && uvEl.value).replace(',', '.'), 10);
-    if (isNaN(uvi)) {
-      outEl.textContent = '—';
-      if (resultBlock) resultBlock.style.display = '';
-      return;
+  
+    function updateForecastUI(currentUv, forecastArray) {
+      var now = new Date(), nowMs = now.getTime();
+      var row = document.getElementById('forecastRow');
+      if (!row) return;
+      var cur = (typeof currentUv === 'number' && !isNaN(currentUv)) ? currentUv : 0;
+      row.innerHTML = '';
+      for (var i = 0; i < 12; i++) {
+        var slotStartMs = nowMs + i * 2 * 3600000;
+        var slotEndMs = nowMs + (i + 1) * 2 * 3600000;
+        var isFirst = (i === 0);
+        var timeLabel = isFirst ? 'Now ◀' : formatTimeRange(slotStartMs, slotEndMs);
+        var uvVal, color, label;
+        if (isFirst) {
+          uvVal = Math.round(cur * 10) / 10;
+          var fl = getUvLevel(cur);
+          color = fl.color;
+          label = getForecastLabel(fl);
+        } else {
+          var f = getUvForSlot(forecastArray, slotStartMs, slotEndMs);
+          if (f && typeof f.uv === 'number' && !isNaN(f.uv)) {
+            uvVal = Math.round(f.uv * 10) / 10;
+            var fl2 = getUvLevel(f.uv);
+            color = fl2.color;
+            label = getForecastLabel(fl2);
+          } else {
+            uvVal = '—';
+            color = 'var(--muted)';
+            label = '—';
+          }
+        }
+        var activeClass = isFirst ? ' forecast-item active' : ' forecast-item';
+        row.innerHTML += '<div class="' + activeClass + '">' +
+          '<div class="f-time">' + timeLabel + '</div>' +
+          '<div class="f-num" style="color:' + color + '">' + uvVal + '</div>' +
+          '<div class="f-label" style="color:' + color + '">' + label + '</div></div>';
+      }
     }
-    var uviEffective = uvi < 1 ? 1 : uvi;
-    var skinType = parseInt(skinEl && skinEl.value, 10) || 2;
-    skinType = Math.max(1, Math.min(6, skinType));
-    var spf = parseInt(spfEl && spfEl.value, 10) || 1;
-    spf = Math.min(50, Math.max(1, isNaN(spf) ? 1 : spf));
-    var cloud = parseFloat(cloudEl && cloudEl.value, 10);
-    if (isNaN(cloud) || cloud <= 0) cloud = 1;
+  
+    var MED_BY_TYPE = [0, 200, 250, 300, 450, 600, 1000];
+    function runSunburnCalc(uvFromApi) {
+      var uvEl = document.getElementById('calcUv');
+      var skinEl = document.getElementById('calcSkin');
+      var spfEl = document.getElementById('calcSpf');
+      var cloudEl = document.getElementById('calcCloud');
+      var outEl = document.getElementById('calcResultValue') || document.querySelector('.calc-result-value');
+      var resultBlock = document.getElementById('calcResult');
+      var uvi = typeof uvFromApi === 'number' && !isNaN(uvFromApi) ? uvFromApi : parseFloat(String(uvEl && uvEl.value).replace(',', '.'), 10);
+      if (isNaN(uvi)) {
+        if (outEl) { outEl.textContent = '—'; if (resultBlock) resultBlock.style.display = ''; }
+        return;
+      }
+      var uviEffective = uvi < 1 ? 1 : uvi;
+      var skinType = parseInt(skinEl && skinEl.value, 10) || 2;
+      skinType = Math.max(1, Math.min(6, skinType));
+      var spf = parseInt(spfEl && spfEl.value, 10) || 1;
+      spf = Math.min(50, Math.max(1, isNaN(spf) ? 1 : spf));
+      var cloud = parseFloat(cloudEl && cloudEl.value, 10);
+      if (isNaN(cloud) || cloud <= 0) cloud = 1;
+  
+      var med = MED_BY_TYPE[skinType] || 250;
+      var irradiance = uviEffective * 0.025 * cloud;
+      if (irradiance <= 0) {
+        outEl.textContent = '—';
+        return;
+      }
+      var timeMinUnprotected = med / (irradiance * 60);
+      var spfMult = 1 + 0.8 * (spf - 1);
+      var timeMin = timeMinUnprotected * spfMult;
+  
+      var resultText;
+      if (!isFinite(timeMin) || timeMin < 0) resultText = '—';
+      else if (timeMin >= 600) resultText = 'Over 10 hours';
+      else if (timeMin < 1) resultText = 'Under 1 min';
+      else if (timeMin < 60) resultText = Math.round(timeMin) + ' min';
+      else {
+        var hrs = Math.floor(timeMin / 60);
+        var mins = Math.round(timeMin % 60);
+        resultText = mins === 0 ? (hrs + ' hr') : (hrs + ' hr ' + mins + ' min');
+      }
+  
+      if (outEl) {
+        outEl.textContent = resultText;
+        outEl.innerText = resultText;
+        if (resultBlock) resultBlock.style.display = '';
+        outEl.setAttribute('aria-label', 'Time before burning: ' + resultText);
+      }
 
-    var med = MED_BY_TYPE[skinType] || 250;
-    var irradiance = uviEffective * 0.025 * cloud;
-    if (irradiance <= 0) {
-      outEl.textContent = '—';
-      return;
     }
-    var timeMinUnprotected = med / (irradiance * 60);
-    var spfMult = 1 + 0.8 * (spf - 1);
-    var timeMin = timeMinUnprotected * spfMult;
+  
+    function setLocationLabel(label) {
+      document.getElementById('locationLabel').textContent = label;
+    }
+  
+    function showError(msg) {
+      var el = document.getElementById('locationError');
+      el.textContent = msg;
+      el.style.display = 'block';
+    }
+  
+    function clearError() {
+      document.getElementById('locationError').style.display = 'none';
+    }
+  
+    var API_BASE = (typeof window !== 'undefined' && window.SUNSMART_API_BASE) ? window.SUNSMART_API_BASE : '';
 
-    var resultText;
-    if (!isFinite(timeMin) || timeMin < 0) {
-      resultText = '—';
-    } else if (timeMin >= 600) {
-      resultText = 'Over 10 hours';
-    } else if (timeMin < 1) {
-      resultText = 'Under 1 min';
-    } else if (timeMin < 60) {
-      resultText = Math.round(timeMin) + ' min';
+    window.__sunSmartUvCache = window.__sunSmartUvCache || {};
+    var UV_CACHE_TTL_MS = 10 * 60 * 1000; // 10 minutes
+
+    function getUvCacheKey(postcode) {
+      return 'sunsmart_uv_cache:' + String(postcode).trim();
+    }
+
+    function readUvCache(postcode) {
+      var key = getUvCacheKey(postcode);
+      var now = Date.now();
+
+      // 1) memory first
+      var mem = window.__sunSmartUvCache[key];
+      if (mem && mem.ts && (now - mem.ts < UV_CACHE_TTL_MS)) {
+        return mem.data;
+      }
+
+      // 2) sessionStorage fallback
+      try {
+        var raw = sessionStorage.getItem(key);
+        if (!raw) return null;
+
+        var parsed = JSON.parse(raw);
+        if (!parsed || !parsed.ts || !parsed.data) return null;
+
+        if (now - parsed.ts >= UV_CACHE_TTL_MS) {
+          sessionStorage.removeItem(key);
+          return null;
+        }
+
+        // refill memory
+        window.__sunSmartUvCache[key] = parsed;
+        return parsed.data;
+      } catch (e) {
+        return null;
+      }
+    }
+
+    function writeUvCache(postcode, data) {
+      var key = getUvCacheKey(postcode);
+      var payload = {
+        ts: Date.now(),
+        data: data
+      };
+
+      // write memory
+      window.__sunSmartUvCache[key] = payload;
+
+      // write sessionStorage
+      try {
+        sessionStorage.setItem(key, JSON.stringify(payload));
+      } catch (e) {}
+    }
+
+    function rememberLastLookup(postcode) {
+      try {
+        sessionStorage.setItem('sunsmart_last_postcode', String(postcode));
+      } catch (e) {}
+    }
+
+    function getLastLookupPostcode() {
+      try {
+        return sessionStorage.getItem('sunsmart_last_postcode');
+      } catch (e) {
+        return null;
+      }
+    }
+  
+    function fetchUvByPostcode(postcode, fallbackLabel) {
+      clearError();
+
+      // 1) try cache first
+      var cached = readUvCache(postcode);
+      if (cached) {
+        var cachedLabel = ((cached.suburb || '') + (cached.state ? ', ' + cached.state : '')).trim();
+        setLocationLabel(cachedLabel || fallbackLabel || ('Postcode ' + postcode));
+        updateUI(cached);
+        rememberLastLookup(postcode);
+        return Promise.resolve(cached);
+      }
+
+      // 2) fetch postcode
+      var postcodeUrl = API_BASE + '/api/postcode/' + encodeURIComponent(postcode);
+
+      return fetch(postcodeUrl)
+        .then(function(res) {
+          if (res.status === 404) throw new Error('Postcode not found.');
+          if (!res.ok) throw new Error('Could not load postcode.');
+          return res.json();
+        })
+        .then(function(postcodeData) {
+          var label = ((postcodeData.suburb || '') + (postcodeData.state ? ', ' + postcodeData.state : '')).trim();
+          setLocationLabel(label || fallbackLabel || ('Postcode ' + postcode));
+
+          var lat = postcodeData.latitude;
+          var lng = postcodeData.longitude;
+          var uvUrl = API_BASE + '/api/uv/current?lat=' + encodeURIComponent(lat) + '&lon=' + encodeURIComponent(lng);
+
+          return fetch(uvUrl)
+            .then(function(r) {
+              if (!r.ok) throw new Error('Could not load UV and conditions.');
+              return r.json();
+            })
+            .then(function(uvData) {
+              // merge postcode + uv result
+              var merged = Object.assign({}, postcodeData, uvData);
+
+              updateUI(merged);
+
+              // full cache
+              writeUvCache(postcode, merged);
+              rememberLastLookup(postcode);
+
+              // keep old compatibility keys if you still want them
+              if (typeof sessionStorage !== 'undefined' && uvData && typeof uvData.uv_index === 'number') {
+                sessionStorage.setItem('sunsmart_uv_index', String(uvData.uv_index));
+                sessionStorage.setItem('sunsmart_postcode', String(postcode));
+              }
+
+              return merged;
+            });
+        })
+        .catch(function(err) {
+          showError(err.message || 'Could not load UV data.');
+          throw err;
+        });
+    }
+  
+    function lookupByPostcode() {
+      var input = document.getElementById('postcodeInput');
+      var btn = document.getElementById('lookupPostcodeBtn');
+      if (!input || !btn) return;
+  
+      var raw = (input.value || '').trim().replace(/\s/g, '');
+      if (!raw) {
+        showError('Please enter a postcode.');
+        return;
+      }
+  
+      var postcode = raw.length <= 4 ? raw : raw.slice(0, 4);
+      if (!/^\d+$/.test(postcode)) {
+        showError('Please enter a valid Australian postcode (4 digits only).');
+        return;
+      }
+  
+      btn.disabled = true;
+      btn.textContent = 'Loading…';
+  
+      fetchUvByPostcode(postcode, 'Postcode ' + postcode)
+        .finally(function() {
+          btn.disabled = false;
+          btn.textContent = '📍 Get UV for postcode';
+        });
+    }
+
+    function init() {
+      var lookupBtn = document.getElementById('lookupPostcodeBtn');
+      var postcodeInput = document.getElementById('postcodeInput');
+
+      if (lookupBtn) lookupBtn.addEventListener('click', lookupByPostcode);
+
+      if (postcodeInput) {
+        postcodeInput.addEventListener('keydown', function(e) {
+          if (e.key === 'Enter') {
+            e.preventDefault();
+            lookupByPostcode();
+          }
+        });
+      }
+
+      var initialPostcode = getLastLookupPostcode() || DEFAULT_POSTCODE;
+      if (postcodeInput) {
+        postcodeInput.value = initialPostcode;
+      }
+
+      fetchUvByPostcode(initialPostcode, DEFAULT_LABEL);
+    }
+  
+    if (document.readyState === 'loading') {
+      document.addEventListener('DOMContentLoaded', init);
     } else {
-      var hrs = Math.floor(timeMin / 60);
-      var mins = Math.round(timeMin % 60);
-      if (mins === 0) resultText = hrs + ' hr';
-      else resultText = hrs + ' hr ' + mins + ' min';
+      init();
     }
-    outEl.textContent = resultText;
-    outEl.innerText = resultText;
-    if (resultBlock) resultBlock.style.display = '';
-    outEl.setAttribute('aria-label', 'Time before burning: ' + resultText);
-
-    var burnBarFill = document.getElementById('burnBarFill');
-    var burnTime = document.getElementById('burnTime');
-    if (burnBarFill && burnTime) {
-      var fillPct = 0;
-      if (isFinite(timeMin) && timeMin >= 0) {
-        if (timeMin >= 600) fillPct = 100;
-        else if (timeMin >= 1) fillPct = (timeMin / 600) * 100;
-      }
-      burnBarFill.style.width = fillPct + '%';
-      burnBarFill.style.background = 'var(--green, #4ade80)';
-      burnTime.textContent = resultText;
-    }
-  }
-
-  function setLocationLabel(label) {
-    document.getElementById('locationLabel').textContent = label;
-  }
-
-  function showError(msg) {
-    var el = document.getElementById('locationError');
-    el.textContent = msg;
-    el.style.display = 'block';
-  }
-
-  function clearError() {
-    document.getElementById('locationError').style.display = 'none';
-  }
-
-  function fetchUv(lat, lng, locationLabel) {
-    if (!OWM_API_KEY || OWM_API_KEY === 'YOUR_OPENWEATHERMAP_API_KEY') {
-      showError('Please set your OpenWeatherMap API key: get one at openweathermap.org and set OWM_API_KEY in the script.');
-      return;
-    }
-    clearError();
-    var url = OWM_ONE_CALL_URL + '?lat=' + encodeURIComponent(lat) + '&lon=' + encodeURIComponent(lng) + '&exclude=minutely,daily,alerts&appid=' + encodeURIComponent(OWM_API_KEY);
-    fetch(url)
-      .then(function(res) {
-        if (res.status === 401) throw new Error('401: Use the API key from your account that has "One Call by Call". New keys can take up to 2 hours to activate.');
-        if (res.status === 403) throw new Error('403: One Call 3.0 access denied. Check your subscription and key.');
-        if (!res.ok) throw new Error('API ' + res.status + ': ' + res.statusText);
-        return res.json();
-      })
-      .then(function(data) {
-        if (data.current) {
-          setLocationLabel(locationLabel || ('Lat ' + lat.toFixed(2) + ', ' + lng.toFixed(2)));
-          updateUI(data);
-        } else {
-          throw new Error('Invalid response');
-        }
-      })
-      .catch(function(err) {
-        showError(err.message || 'Could not load UV data. Check API key and try again.');
-      });
-  }
-
-  // Postcode lookup: request backend API (database on EC2) for lat/lng, then fetch UV
-  // Set window.SUNSMART_API_BASE to your backend URL if different origin (e.g. 'https://your-ec2:8000')
-  var POSTCODE_API_BASE = (typeof window !== 'undefined' && window.SUNSMART_API_BASE) ? window.SUNSMART_API_BASE : '';
-
-  function lookupByPostcode() {
-    var input = document.getElementById('postcodeInput');
-    var btn = document.getElementById('lookupPostcodeBtn');
-    if (!input || !btn) return;
-
-    var raw = (input.value || '').trim().replace(/\s/g, '');
-    if (!raw) {
-      showError('Please enter a postcode.');
-      return;
-    }
-
-    var postcode = raw.length <= 4 ? raw : raw.slice(0, 4);
-    if (!/^\d+$/.test(postcode)) {
-      showError('Please enter a valid Australian postcode (digits only).');
-      return;
-    }
-
-    clearError();
-    btn.disabled = true;
-    btn.textContent = 'Loading…';
-
-    var url = POSTCODE_API_BASE + '/api/postcode/' + encodeURIComponent(postcode);
-    fetch(url)
-      .then(function(res) {
-        if (res.status === 404) throw new Error('Postcode not found.');
-        if (!res.ok) throw new Error('Could not look up postcode.');
-        return res.json();
-      })
-      .then(function(loc) {
-        var label = (loc.suburb || '') + (loc.state ? ', ' + loc.state : '') || ('Postcode ' + postcode);
-        fetchUv(loc.latitude, loc.longitude, label);
-      })
-      .catch(function(err) {
-        showError(err.message || 'Could not look up postcode. Check that the API is running.');
-      })
-      .finally(function() {
-        btn.disabled = false;
-        btn.textContent = '📍 Get UV for postcode';
-      });
-  }
-
-  function init() {
-    var lookupBtn = document.getElementById('lookupPostcodeBtn');
-    var postcodeInput = document.getElementById('postcodeInput');
-    if (lookupBtn) lookupBtn.addEventListener('click', lookupByPostcode);
-    if (postcodeInput) {
-      postcodeInput.addEventListener('keydown', function(e) {
-        if (e.key === 'Enter') { e.preventDefault(); lookupByPostcode(); }
-      });
-    }
-
-    var calcBtn = document.getElementById('calcBtn');
-    if (calcBtn) {
-      calcBtn.addEventListener('click', function(e) {
-        e.preventDefault();
-        runSunburnCalc();
-      });
-    }
-
-    runSunburnCalc();
-    fetchUv(DEFAULT_LAT, DEFAULT_LNG, DEFAULT_LABEL);
-  }
-
-  if (document.readyState === 'loading') {
-    document.addEventListener('DOMContentLoaded', init);
-  } else {
-    init();
-  }
-})();
-</script>
+  })();
+  </script>
 </body>
 </html>
