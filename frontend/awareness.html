@@ -37,7 +37,7 @@
       </div>
     </div>
 
-    <section class="chart-grid">
+    <section class="stack">
       <div class="card">
         <div class="card-title">Cancer Incidence by Age Group</div>
         <p class="chart-desc">
@@ -46,6 +46,10 @@
         <div id="ageLoading" class="loading-text">Loading chart data...</div>
         <div id="ageError" class="error-text hidden">Failed to load age-group data.</div>
         <canvas id="ageChart"></canvas>
+
+        <div class="chart-note">
+          <strong>Insight:</strong> Cancer incidence generally increases with age, with the highest burden appearing in older age groups. This highlights the importance of regular skin checks and early prevention habits across the lifespan.
+        </div>
       </div>
 
       <div class="card">
@@ -56,6 +60,10 @@
         <div id="stateLoading" class="loading-text">Loading chart data...</div>
         <div id="stateError" class="error-text hidden">Failed to load state data.</div>
         <canvas id="stateChart"></canvas>
+
+        <div class="chart-note">
+          <strong>Insight:</strong> Incidence levels differ across regions, which may reflect population size, environmental exposure, and health reporting differences. Users can use this comparison to better understand regional patterns of skin cancer risk.
+        </div>
       </div>
     </section>
 
@@ -68,6 +76,10 @@
         <div id="mortalityLoading" class="loading-text">Loading chart data...</div>
         <div id="mortalityError" class="error-text hidden">Failed to load mortality data.</div>
         <canvas id="mortalityChart"></canvas>
+
+        <div class="chart-note">
+          <strong>Insight:</strong> Mortality also trends upward in later age groups, showing that the consequences of skin cancer can be severe when not detected early. Prevention, awareness, and timely diagnosis remain essential.
+        </div>
       </div>
 
       <div class="card">
