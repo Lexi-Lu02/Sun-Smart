@@ -42,6 +42,7 @@
   --radius-sm: 12px;
   --radius-lg: 22px;
   --radius-pill: 999px;
+  --r: 12px; 
 }
 
 html {
@@ -49,7 +50,7 @@ html {
 }
 
 body {
-  font-family: "Microsoft YaHei", "PingFang SC", sans-serif;
+  font-family: Arial, Helvetica, sans-serif;
   background: var(--bg);
   color: var(--text);
   min-height: 100vh;
@@ -217,6 +218,7 @@ svg {
   color: var(--muted);
   font-size: 15px;
   line-height: 1.6;
+  margin-bottom: 8px;
 }
 
 /* =========================
@@ -256,6 +258,11 @@ svg {
 .clothing-card {
   background: var(--surf);
   border: 1px solid var(--border);
+}
+
+.clothing-card.rec-highlight {
+  border-color: var(--green);
+  box-shadow: 0 0 0 2px rgba(56, 211, 159, 0.35), 0 4px 12px rgba(56, 211, 159, 0.12);
 }
 
 .card {
@@ -340,6 +347,10 @@ svg {
   gap: 18px;
 }
 
+.two-col {
+  margin-top: 20px;
+}
+
 .card-grid-3,
 .myths-row,
 .rec-grid {
@@ -352,7 +363,7 @@ svg {
   display: grid;
   grid-template-columns: 1fr 1fr;
   gap: 16px;
-  margin-top: 16px;
+  margin-top: 32px;
 }
 
 .form-block {
@@ -448,6 +459,20 @@ svg {
   font-weight: 700;
 }
 
+.risk-card-icons {
+  display: flex;
+  align-items: center;
+  justify-content: flex-start;
+  gap: 16px;
+  margin-top: 14px;
+}
+
+.risk-card-icons .risk-icon {
+  width: 100px;
+  height: 100px;
+  object-fit: contain;
+}
+
 .postcode-lookup {
   display: flex;
   flex-wrap: wrap;
@@ -472,7 +497,7 @@ svg {
   border: 1px solid rgba(255, 255, 255, 0.2);
   background: rgba(255, 255, 255, 0.06);
   color: var(--text, #eef2ff);
-  font-family: "DM Sans", sans-serif;
+  font-family: "Syne", sans-serif;
 }
 
 .postcode-lookup .postcode-input::placeholder {
@@ -544,13 +569,14 @@ svg {
   -webkit-appearance: none;
   height: 8px;
   border-radius: 999px;
+  /* Track segments match slider min=1 max=13: Low 1-2, Moderate 3-5, High 6-7, Very High 8-10, Extreme 11-13 */
   background: linear-gradient(
     to right,
-    #4ade80 0%, #4ade80 18%,
-    #facc15 18%, #facc15 45%,
-    #fb923c 45%, #fb923c 64%,
-    #f87171 64%, #f87171 82%,
-    #c084fc 82%, #c084fc 100%
+    #4ade80 0%, #4ade80 17%,
+    #facc15 17%, #facc15 42%,
+    #fb923c 42%, #fb923c 58%,
+    #f87171 58%, #f87171 83%,
+    #c084fc 83%, #c084fc 100%
   );
   outline: none;
 }
@@ -1229,6 +1255,7 @@ svg {
   border: 1px solid var(--border);
   border-radius: var(--radius);
   padding: 18px 24px;
+  margin-top: 28px;
   margin-bottom: 24px;
 }
 
@@ -1412,6 +1439,16 @@ svg {
 
 .clothing-card.warn::before { background: var(--orange); }
 .clothing-card.ok::before { background: var(--green); }
+.clothing-card.card-accent-green::before { background: var(--green); }
+.clothing-card.card-accent-green { background: linear-gradient(to bottom, rgba(56, 211, 159, 0.08) 0%, var(--surf) 60px); }
+.clothing-card.card-accent-yellow::before { background: var(--yellow); }
+.clothing-card.card-accent-yellow { background: linear-gradient(to bottom, rgba(250, 204, 21, 0.08) 0%, var(--surf) 60px); }
+.clothing-card.card-accent-orange::before { background: var(--orange); }
+.clothing-card.card-accent-orange { background: linear-gradient(to bottom, rgba(255, 107, 53, 0.08) 0%, var(--surf) 60px); }
+.clothing-card.card-accent-red::before { background: var(--red); }
+.clothing-card.card-accent-red { background: linear-gradient(to bottom, rgba(248, 113, 113, 0.08) 0%, var(--surf) 60px); }
+.clothing-card.card-accent-purple::before { background: var(--purple); }
+.clothing-card.card-accent-purple { background: linear-gradient(to bottom, rgba(176, 132, 255, 0.08) 0%, var(--surf) 60px); }
 
 .cc-header {
   display: flex;
@@ -1434,6 +1471,8 @@ svg {
 .cc-icon-wrap.green { background: rgba(56, 211, 159, 0.15); }
 .cc-icon-wrap.orange { background: rgba(255, 107, 53, 0.15); }
 .cc-icon-wrap.amber { background: rgba(255, 184, 48, 0.15); }
+.cc-icon-wrap.yellow { background: rgba(250, 204, 21, 0.15); }
+.cc-icon-wrap.red { background: rgba(248, 113, 113, 0.15); }
 .cc-icon-wrap.purple { background: rgba(176, 132, 255, 0.15); }
 
 .cc-cat {
@@ -1517,6 +1556,7 @@ svg {
 
 .upf-explainer {
   padding: 22px;
+  grid-column: 1 / -1;
 }
 
 .upf-scale {
