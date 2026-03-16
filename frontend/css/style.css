@@ -92,7 +92,6 @@ svg {
   height: 64px;
   display: flex;
   align-items: center;
-  justify-content: space-between;
   padding: 0 36px;
   background: rgba(10, 15, 30, 0.88);
   backdrop-filter: blur(14px);
@@ -112,6 +111,9 @@ svg {
 
 .nav-links,
 .nav-tabs {
+  position: absolute;
+  left: 50%;
+  transform: translateX(-50%);
   display: flex;
   gap: 8px;
 }
@@ -137,6 +139,7 @@ svg {
 }
 
 .nav-user {
+  margin-left: auto;
   width: 36px;
   height: 36px;
   border-radius: 50%;
@@ -145,7 +148,6 @@ svg {
   place-items: center;
   color: white;
   font-weight: 800;
-  font-family: "Syne", sans-serif;
 }
 
 /* =========================
